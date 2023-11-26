@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+  import registrationForm from './components/registrationForm.vue'
 </script>
 
 <template>
@@ -10,8 +10,13 @@
     <a href="https://vuejs.org/" target="_blank">
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
+
+
+    <registration-form/>
   </div>
-  <HelloWorld msg="Vite + Vue" />
+
+
+
 </template>
 
 <style scoped>

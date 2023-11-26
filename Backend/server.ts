@@ -2,8 +2,11 @@ import express from 'express'
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './trpc/router';
 import dotenv from 'dotenv';
-import pool from './db'
+import { PrismaClient } from '@prisma/client';
+
 dotenv.config();
+
+const prisma = new PrismaClient();
 
 const app = express();
 
@@ -11,7 +14,7 @@ const app = express();
 app.use('/trpc', createExpressMiddleware({
     router: appRouter,
     createContext: () => ({
-        db: pool,
+        db: prisma,
     }), // Updated to return an empty object
   }));
   

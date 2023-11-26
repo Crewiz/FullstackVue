@@ -1,11 +1,62 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  password  String
+  agreeTerms Boolean
+  timestamp DateTime @default(now())
+  posts     Post[] 
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean  @default(false)
+  title     String   @db.VarChar(255)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+// enum Role {
+//   USER
+//   ADMIN
+// }
+
+// model Recipe {
+//   id          Int       @id @default(autoincrement())
+//   title       String
+//   description String
+//   ingredients String[] // You might want a separate model for Ingredients
+//   steps       String[]
+//   imageUrl    String?
+//   // ... other properties
+
+//   // Relationships
+//   author      User      @relation(fields: [authorId], references: [id])
+//   authorId    Int       // Foreign key to relate to the User who created the recipe
+
+//   ratings     Rating[]  // One-to-many relationship with Rating model
+// }
+
+// model Rating {
+//   id         Int     @id @default(autoincrement())
+//   value      Int     // Rating value (e.g., 1-5)
+//   recipe     Recipe  @relation(fields: [recipeId], references: [id])
+//   recipeId   Int     // Foreign key to relate to the Recipe being rated
+//   user       User    @relation(fields: [userId], references: [id])
+//   userId     Int     // Foreign key to relate to the User who rated the recipe
+// }
