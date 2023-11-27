@@ -1,35 +1,30 @@
-<script setup lang="ts">
+<script setup>
   import registrationForm from './components/registrationForm.vue'
+  import loginForm from './components/loginForm.vue'
+  import navigationBar from './components/navigationBar.vue'
+  import themeToggle from './components/themeToggle.vue'
+
+  
+
 </script>
 
+
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-
-
-    <registration-form/>
-  </div>
-
-
-
+  <v-app>
+    <navigation-bar/>
+    <v-main> 
+      <v-container fluid> 
+        <v-row justify="center" align="center" style="min-height: 100vh;"> <!-- Vertical and horizontal centering -->
+          <v-col cols="12" sm="8" md="6" lg="4"> <!-- Adjusted for different screen sizes -->
+            <theme-toggle/>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
+
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+
 </style>

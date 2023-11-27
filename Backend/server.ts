@@ -1,22 +1,27 @@
 import express from 'express'
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { appRouter } from './trpc/router';
+import { userRouter } from './trpc/userRouter';
+import { createAppRouter } from './trpc/router';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
 
 const prisma = new PrismaClient();
-
 const app = express();
+const appRouter= createAppRouter(userRouter);
 
 //tRPC middlewaregrejer
 app.use('/trpc', createExpressMiddleware({
     router: appRouter,
-    createContext: () => ({
+    createContext: () => {
+      console.log('Creating tRPC context');
+      return {
         db: prisma,
-    }), // Updated to return an empty object
+      };
+    },
   }));
+  
   
 
 app.get('/', (req, res) => {
