@@ -16,7 +16,6 @@ model User {
   firstName String?
   lastName  String?
   password  String
-  agreeTerms Boolean
   timestamp DateTime @default(now())
   posts     Post[] 
 }

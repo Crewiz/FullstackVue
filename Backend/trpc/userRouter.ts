@@ -18,7 +18,6 @@ const createUserInput = z.object({
     lastName: z.string(),
     email: z.string().email(),
     password: z.string(),
-    agreeTerms: z.boolean(),
   }),
 });
 

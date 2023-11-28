@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { userRouter } from './trpc/userRouter';
 import { createAppRouter } from './trpc/router';
@@ -10,6 +11,12 @@ dotenv.config();
 const prisma = new PrismaClient();
 const app = express();
 const appRouter= createAppRouter(userRouter);
+
+app.use(cors({
+    origin: 'http://localhost:5173'
+}))
+
+app.use(express.json());
 
 //tRPC middlewaregrejer
 app.use('/trpc', createExpressMiddleware({
