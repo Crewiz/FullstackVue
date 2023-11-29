@@ -2,6 +2,7 @@ import { t, Context } from './router';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -81,10 +82,28 @@ export const userRouter = t.router({
               password: hashedPassword,
             },
           });
+          const tokenForNewUser = jwt.sign(
+            { userId: createdUser.id  },
+            process.env.JWT_SECRET as string,
+            { expiresIn: '3h' }
+          );
+          console.log('Generated JWT for new user', tokenForNewUser)
           console.log('User created:', createdUser);
-          return createdUser;
+          return {user: createdUser, token: tokenForNewUser};
 
-        
+        case 'login':
+          const userToLogin = await db.user.findUnique({
+            where: { email: input.data.email }
+          });
+          if (!userToLogin || !await bcrypt.compare(input.data.password, userToLogin.password)) {
+            throw new Error('Invalid email or password');
+          }
+          const tokenForLogin = jwt.sign(
+            { userId: userToLogin.id },
+            process.env.JWT_SECRET as string,
+            { expiresIn: '3h'}
+          );
+          return { user: userToLogin, token: tokenForLogin };
 
         case 'update':
           console.log('Update data:', input.data, 'ID:', input.id);
