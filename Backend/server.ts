@@ -12,10 +12,12 @@ const prisma = new PrismaClient();
 const app = express();
 const appRouter= createAppRouter(userRouter);
 
-app.use(cors({
-    origin: 'http://localhost:5173'
-}))
-
+if (process.env.NODE_ENV === 'development') {
+    app.use(cors()); // Allows requests from any origin in development
+} else {
+    // For production, set a specific origin
+    app.use(cors({ origin: 'your production frontend URL' }));
+}
 app.use(express.json());
 
 //tRPC middlewaregrejer

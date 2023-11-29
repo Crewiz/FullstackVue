@@ -21,6 +21,15 @@ const createUserInput = z.object({
   }),
 });
 
+//Validator for user login
+const loginUserInput = z.object({
+  action: z.literal('login'),
+  data: z.object({
+    email: z.string().email(),
+    password: z.string(),
+  }),
+})
+
 // Validator for updating a user
 const updateUserInput = z.object({
   action: z.literal('update'),
@@ -46,7 +55,11 @@ const getUserInput = z.object({
 });
 
 // Union of all user action inputs
-const userActions = createUserInput.or(updateUserInput).or(deleteUserInput).or(getUserInput);
+const userActions = createUserInput
+  .or(updateUserInput)
+  .or(deleteUserInput)
+  .or(getUserInput)
+  .or(loginUserInput);
 
 export const userRouter = t.router({
   user: t.procedure
@@ -70,6 +83,8 @@ export const userRouter = t.router({
           });
           console.log('User created:', createdUser);
           return createdUser;
+
+        
 
         case 'update':
           console.log('Update data:', input.data, 'ID:', input.id);
