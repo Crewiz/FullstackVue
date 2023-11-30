@@ -1,6 +1,7 @@
 import { initTRPC } from '@trpc/server';
 import { PrismaClient } from '@prisma/client'
 import { UserRouterType } from './userRouter';
+import { gptRouter, GptRouterType } from './gptRouter'
 
 
 
@@ -16,7 +17,7 @@ export const createAppRouter = (userRouter: UserRouterType) => {
   
     return t.router({
       user: userRouter, //mergar userrouter
-      // andra routers merges här
+      gpt: gptRouter,
     });
   };
   

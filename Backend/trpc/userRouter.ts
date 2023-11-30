@@ -73,23 +73,30 @@ export const userRouter = t.router({
 
       switch (input.action) {
         case 'create':
-          console.log('Create data:', input.data);
-          // Hash the password before storing it
-          const hashedPassword = await bcrypt.hash(input.data.password, 10);
-          const createdUser = await db.user.create({
-            data: {
-              ...input.data,
-              password: hashedPassword,
-            },
-          });
-          const tokenForNewUser = jwt.sign(
-            { userId: createdUser.id  },
-            process.env.JWT_SECRET as string,
-            { expiresIn: '3h' }
-          );
-          console.log('Generated JWT for new user', tokenForNewUser)
-          console.log('User created:', createdUser);
-          return {user: createdUser, token: tokenForNewUser};
+        console.log('Processing create action with data:', input.data);  
+  try {
+    console.log('Create action received with data:', input.data);
+    // Hash the password before storing it
+    const hashedPassword = await bcrypt.hash(input.data.password, 10);
+    const createdUser = await db.user.create({
+      data: {
+        ...input.data,
+        password: hashedPassword,
+      },
+    });
+    const tokenForNewUser = jwt.sign(
+      { userId: createdUser.id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '3h' }
+    );
+    console.log('Generated JWT for new user', tokenForNewUser);
+    console.log('User created:', createdUser);
+    return { user: createdUser, token: tokenForNewUser };
+  } catch (error) {
+    console.error("Error in creating user:", error);
+    throw error; // Re-throw the error for further handling if necessary
+  }
+
 
         case 'login':
           const userToLogin = await db.user.findUnique({
@@ -103,6 +110,7 @@ export const userRouter = t.router({
             process.env.JWT_SECRET as string,
             { expiresIn: '3h'}
           );
+          console.log('Generated JWT for logged-in user:', tokenForLogin)
           return { user: userToLogin, token: tokenForLogin };
 
         case 'update':

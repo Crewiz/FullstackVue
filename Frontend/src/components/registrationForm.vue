@@ -129,7 +129,9 @@ export default {
     });
   },
   methods: {
-    async handleSubmit() {
+    async handleSubmit(e: Event) {
+    e.preventDefault();
+      console.log("Form submission started with data:", this.firstName, this.lastName, this.email, this.password, this.confirmPassword);
       const formData = {
         firstName: this.firstName,
         lastName: this.lastName,
@@ -143,6 +145,7 @@ export default {
 
       // Check if validation was successful
       if (!validationResult.success) {
+        console.log("Validation failed with errors:", this.validationErrors);
         // Format and store validation errors for displaying to the user
         this.validationErrors = this.formatZodErrors(validationResult.error);
         this.submissionMessage = ''; // Clear success message
@@ -151,21 +154,21 @@ export default {
 
       // If validation passes, proceed with submitting the form data
       try {
-        
-        const response = await apiService.createUser(formData);
-        this.submissionMessage = 'Registration successful!';
-        // Handle additional success logic (e.g., redirecting the user)
-        if (!response.ok) throw new Error ('Failed to register user')
-        const resData = await response.json()
-        
-        if (resData.status === 'fail') throw new Error (resData.message)
-        return resData;
-      } catch (error) {
-        console.error("Error submitting form", error);
-        this.submissionMessage = 'Registration failed. Please try again.';
-        // Handle error logic (e.g., displaying error messages)
-      }
-    },
+    const response = await apiService.createUser(formData);
+
+    // If the request was processed successfully
+    if (response.status === 200 || response.status === 201) {
+      this.submissionMessage = 'Registration successful!';
+    } else {
+      // Handle other status codes appropriately
+      throw new Error(`Failed to register user: Status code ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error submitting form", error);
+    this.submissionMessage = 'Registration failed. Please try again.';
+  }
+},
+
 
     // Utility method to format Zod errors
     formatZodErrors(zodError) {

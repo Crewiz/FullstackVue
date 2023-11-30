@@ -35,35 +35,29 @@ interface ErrorResponse {
 
 const apiService = {
   // Function to create a new user
-  async createUser(userData: UserRegistrationData): Promise<UserResponse> {
+  async createUser(userData: UserRegistrationData): Promise<AxiosResponse<UserResponse>> {
     try {
+      console.log("Making API request with:", userData);
       const response = await axios.post<UserResponse>(`${BASE_URL}/user.user`, {
         action: 'create',
         data: userData,
       });
-      return response.data;
+      console.log("API response received:", response);
+      return response; // Return the whole response
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
-      throw new Error(axiosError.response?.data.message || 'An error occurred');
+      
+      console.error("API request failed with error:", axiosError.message);
+      if (axiosError.response) {
+        console.error("Status code:", axiosError.response.status);
+        console.error("Response data:", axiosError.response.data);
+      } else {
+        console.error("Error details:", axiosError);
+      }
+
+      throw new Error(axiosError.response?.data.message || 'An error occurred during API request');
     }
   },
-
-  // Function to get a user by ID
-  async getUser(id: number): Promise<UserResponse> {
-    // Implementation
-  },
-
-  // Function to update a user
-  async updateUser(id: number, userData: UserUpdateData): Promise<UserResponse> {
-    // Implementation
-  },
-
-  // Function to delete a user
-  async deleteUser(id: number): Promise<void> {
-    // Implementation
-  },
-
-  // Add other API functions as needed
 };
 
 export default apiService;
