@@ -3,9 +3,9 @@ import cors from 'cors'
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { userRouter } from './trpc/userRouter';
 import { createAppRouter } from './trpc/router';
-import { gptRouter } from './trpc/gptRouter';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { gptRouter } from './trpc/gptRouter';
 
 dotenv.config();
 
