@@ -1,5 +1,5 @@
 // apiService.ts
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 // Base URL for the API
 const BASE_URL = 'http://localhost:3000/trpc';
@@ -38,7 +38,7 @@ const apiService = {
   async createUser(userData: UserRegistrationData): Promise<AxiosResponse<UserResponse>> {
     try {
       console.log("Making API request with:", userData);
-      const response = await axios.post<UserResponse>(`${BASE_URL}/user.user`, {
+      const response = await axios.post<UserResponse>(`${BASE_URL}/user`, {
         action: 'create',
         data: userData,
       });
