@@ -15,7 +15,7 @@
         <v-row justify="center" align="center" style="min-height: 100vh;"> <!-- Vertical and horizontal centering -->
           <v-col cols="12" sm="8" md="6" lg="4"> <!-- Adjusted for different screen sizes -->
             <theme-toggle/>
-            <recipeChat/>
+            <loginForm/>
           </v-col>
         </v-row>
       </v-container>

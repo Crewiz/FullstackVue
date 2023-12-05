@@ -1,5 +1,5 @@
 <template>
-  <v-form v-model="valid" @submit="handleSubmit">
+  <v-form v-model="valid" @submit.prevent="handleSubmit">
     <h1>Register a new user</h1>
     <p>Enter your information to create your account.</p>
     <v-container>
@@ -129,8 +129,7 @@ export default {
     });
   },
   methods: {
-    async handleSubmit(e: Event) {
-    e.preventDefault();
+    async handleSubmit() {
       console.log("Form submission started with data:", this.firstName, this.lastName, this.email, this.password, this.confirmPassword);
       const formData = {
         firstName: this.firstName,

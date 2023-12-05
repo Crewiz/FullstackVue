@@ -1,17 +1,20 @@
 import express from 'express'
 import cors from 'cors'
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { userRouter } from './trpc/userRouter';
-import { createAppRouter } from './trpc/router';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
-import { gptRouter } from './trpc/gptRouter';
+import { createAppRouter } from './trpc/router';
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
+
+import { userRouter } from './trpc/userRouter';
+import { gptRouter } from './trpc/gptRouter';
+
 const appRouter= createAppRouter(userRouter, gptRouter);
+
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} Request to ${req.originalUrl}`);
     console.log('Request Body:', req.body);
@@ -19,7 +22,6 @@ app.use((req, res, next) => {
   });
 
 app.use(cors({ origin: '*' }));
-
 app.use(express.json());
 
 //tRPC middlewaregrejer
@@ -32,8 +34,6 @@ app.use('/trpc', createExpressMiddleware({
       };
     },
   }));
-
-  //JWT grejer
 
 
 app.get('/', (req, res) => {
