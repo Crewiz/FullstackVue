@@ -19,7 +19,7 @@
 
 
 <script lang="ts">
-import apiService from '../API/apiService';
+import apiService from '../../API/apiService';
 import { AxiosResponse } from 'axios';
 
 export default {
@@ -37,12 +37,11 @@ export default {
         const { userData } = this;
         const response: AxiosResponse<UserResponse> = await apiService.loginUser(userData);
         
-        // Assuming successful login just logs the response for demonstration
+        localStorage.setItem('token', response.data.token);
         console.log('Login successful:', response.data);
         
-        // You can redirect or perform other actions upon successful login
+        this.$router.push('/homePage');
       } catch (error) {
-        // Handle login error (display error message, etc.)
         console.error('Login failed:', error.message);
       }
     },

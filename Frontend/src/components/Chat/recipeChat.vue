@@ -8,7 +8,7 @@
 <script>
 import MessageList from './MessageList.vue';
 import ChatInput from './ChatInput.vue';
-import apiService from '.././API/apiService.ts';
+import apiService from '../../API/apiService.ts';
 
 export default {
   components: { MessageList, ChatInput },

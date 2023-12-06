@@ -77,7 +77,7 @@
 
 <script lang="ts">
 import { z } from 'zod';
-import apiService from '../API/apiService'
+import apiService from '../../API/apiService'
 
 export default {
   data() {

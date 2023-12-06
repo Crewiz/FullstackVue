@@ -107,7 +107,7 @@ export const userRouter = t.procedure
         const tokenForLogin = jwt.sign(
           { userId: userToLogin.id },
           process.env.JWT_SECRET as string,
-          { expiresIn: '3h' }
+          { expiresIn: '7d' }
         );
         console.log('Generated JWT for logged-in user:', tokenForLogin)
         return { user: userToLogin, token: tokenForLogin };

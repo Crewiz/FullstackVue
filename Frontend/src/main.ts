@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import homePage from './components/Layout/homePage.vue';
 
 // Vuetify
 import 'vuetify/styles';
@@ -34,4 +36,21 @@ const vuetify = createVuetify({
   },
 });
 
-createApp(App).use(vuetify).mount('#app');
+const routes: RouteRecordRaw[] = [
+  {
+      path: '/',
+      name: 'Home',
+      component: homePage,
+  },
+  {
+    path: '/:pathMatch(.*)*', // redirectar alla odefinerade routes till homepage
+    redirect: '/',
+  },
+];
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+});
+
+createApp(App).use(vuetify).use(router).mount('#app');
