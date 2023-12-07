@@ -1,7 +1,11 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createPinia } from 'pinia'
 import homePage from './components/Layout/homePage.vue';
+// import loginForm from './components/Auth/loginForm.vue';
+import registrationForm from './components/Auth/registrationForm.vue';
+
 
 // Vuetify
 import 'vuetify/styles';
@@ -17,19 +21,20 @@ const vuetify = createVuetify({
     themes: {
       dark: {
         colors: {
-          primary: '#2196F3', // Primary color for the light theme
-          secondary: '#FFC107', // Secondary color for the light theme
-          accent: '#FF5252', // Accent color for the light theme
-          // ... other colors for the light theme
-      
+          primary: '#8D6C68', 
+          secondary: '#4E523D', 
+          accent: '#647557', 
+          background: '#060404',
+          text: '#F0EBEA'
         },
       },
       light: {
         colors: {
-          primary: '#ff5722', // Primary color for the dark theme
-          secondary: '#424242', // Secondary color for the dark theme
-          accent: '#82B1FF', // Accent color for the dark theme
-          // ... other colors for the dark theme
+          primary: '#987773', 
+          secondary: '#BFC3AD', 
+          accent: '#98A98A', 
+          background: '#FBF9F9',
+          text: '#140F0E'
         },
       },
     },
@@ -38,9 +43,14 @@ const vuetify = createVuetify({
 
 const routes: RouteRecordRaw[] = [
   {
-      path: '/',
-      name: 'Home',
-      component: homePage,
+    path: '/',
+    name: 'Home',
+    component: homePage,
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: registrationForm,
   },
   {
     path: '/:pathMatch(.*)*', // redirectar alla odefinerade routes till homepage
@@ -53,4 +63,4 @@ const router = createRouter({
   routes,
 });
 
-createApp(App).use(vuetify).use(router).mount('#app');
+createApp(App).use(vuetify).use(createPinia()).use(router).mount('#app');

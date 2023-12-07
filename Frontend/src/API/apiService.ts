@@ -26,8 +26,19 @@ interface UserActionRequest {
 }
 
 interface UserResponse {
-  // Define based on your backend response for user actions
+  result: {
+    data: {
+      user: {
+        firstName: string;
+        lastName: string;
+        // other user properties
+      },
+      token: string;
+    }
+  }
+  // any other properties that might be part of the response
 }
+
 
 interface LoginData {
   email: string;
@@ -38,6 +49,9 @@ interface ErrorResponse {
   message: string;
 }
 
+
+
+
 const apiService = {
   // Function to create a new user
   async createUser(userData: UserRegistrationData): Promise<AxiosResponse<UserResponse>> {
@@ -47,12 +61,12 @@ const apiService = {
         action: 'create',
         data: userData,
       });
-      console.log("API response received:", response);
+      console.log("Login successful", response);
+      console.log("User's first name:", response.data.user.firstName);
       return response; // Return the whole response
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
-      
-      console.error("API request failed with error:", axiosError.message);
+      console.error("Login  request failed with error:", axiosError.message);
       if (axiosError.response) {
         console.error("Status code:", axiosError.response.status);
         console.error("Response data:", axiosError.response.data);
@@ -63,16 +77,24 @@ const apiService = {
       throw new Error(axiosError.response?.data.message || 'An error occurred during API request');
     }
   },
-  async loginUser(userData: LoginData): Promise<AxiosResponse<UserResponse>> {
+  async loginUser(userData: LoginData): Promise<UserResponse> {
     try {
       const response = await axios.post<UserResponse>(`${BASE_URL}/user`, {
         action: 'login',
         data: userData,
       });
-      console.log("Login successful", response);
-      return response;
+  
+      if (response.status >= 200 && response.status < 300 && response.data.result && response.data.result.data) {
+        console.log("Login successful", response.data.result.data);
+        console.log("User's first name:", response.data.result.data.user.firstName);
+        
+        // Return the response directly as it matches UserResponse interface
+        return response.data;
+      } else {
+        throw new Error(`Login failed. User data is missing or invalid status code: ${response.status}`);
+      }
     } catch (error) {
-
+      console.error("Error in loginUser:", error);
       throw new Error('Login failed. Please try again.');
     }
   },

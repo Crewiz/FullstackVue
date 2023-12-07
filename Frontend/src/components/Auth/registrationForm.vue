@@ -158,6 +158,7 @@ export default {
     // If the request was processed successfully
     if (response.status === 200 || response.status === 201) {
       this.submissionMessage = 'Registration successful!';
+      this.$router.push('/homePage');
     } else {
       // Handle other status codes appropriately
       throw new Error(`Failed to register user: Status code ${response.status}`);
