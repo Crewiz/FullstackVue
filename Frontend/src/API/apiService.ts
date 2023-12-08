@@ -48,8 +48,12 @@ interface LoginData {
 interface ErrorResponse {
   message: string;
 }
+type ChatResponse = string;
+interface RecipeResponse {
+  ingredients: string[];
+  instructions: string[];
 
-
+}
 
 
 const apiService = {
@@ -101,29 +105,40 @@ const apiService = {
 
 
 
-async getAssistantResponse(message: string): Promise<AxiosResponse<string>> {
-  try {
-    const response = await axios.post<string>(`${BASE_URL}/gpt`, {
-      action: 'ask',
-      data: { message },
-    });
-    console.log("Assistant response received:", response);
-    return response;
-  } catch (error) {
-    const axiosError = error as AxiosError<{ message: string }>;
-
-    console.error("API request to get assistant response failed with error:", axiosError.message);
-    if (axiosError.response) {
-      console.error("Status code:", axiosError.response.status);
-      console.error("Response data:", axiosError.response.data);
-    } else {
-      console.error("Error details:", axiosError);
+  async getAssistantResponse(message: string): Promise<ChatResponse | RecipeResponse> {
+    try {
+      const response = await axios.post<string>(`${BASE_URL}/gpt`, {
+        action: 'ask',
+        data: { message },
+      });
+      console.log("Assistant response received:", response.data);
+  
+      try {
+        // Attempt to parse the response as JSON
+        const jsonData = JSON.parse(response.data);
+        // Check if it's a recipe response
+        if (jsonData.ingredients && jsonData.instructions) {
+          return jsonData as RecipeResponse;
+        }
+      } catch (error) {
+        // If parsing fails, it's a regular chat response
+        return response.data as ChatResponse;
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      console.error("API request to get assistant response failed with error:", axiosError.message);
+      if (axiosError.response) {
+        console.error("Status code:", axiosError.response.status);
+        console.error("Response data:", axiosError.response.data);
+      } else {
+        console.error("Error details:", axiosError);
+      }
+      throw new Error(axiosError.response?.data.message || 'An error occurred during API request to get assistant response');
     }
-
-    throw new Error(axiosError.response?.data.message || 'An error occured during API request to get assistant response');
   }
-},
+  
+  
+}
 
-};
 
 export default apiService;

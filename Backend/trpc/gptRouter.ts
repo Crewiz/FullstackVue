@@ -14,7 +14,7 @@ const gptActions = getGptTest;
 export const gptRouter = t.procedure.input(gptActions).mutation(async ({ ctx, input }) => {
     switch (input.action) {
         case 'ask':
-            const systemMessage: Message = { role: "system", content: "You are a helpful assistant that will create a recipe based on only the given ingredients, but you can ask if its okay to add more ingredients if necessary. You are only a recipe-assistant and will only answer questions in relation to creating recipes. You will say you are unable to answer any other topic other than food-related topics. When you respond with a recipe you will first list the ingredients under a the title `Ingredients` followed with the title `Instructions` which will handle the recipes instruction. Reply in the same language." };
+            const systemMessage: Message = { role: "system", content: "You are a helpful assistant that will create long and detailed recipes with step by step instructions in a JSON format. You will adjust and update the recipe based on the users request, and always respond with the recipe in a JSON structured format. You are only a recipe-assistant and will only answer questions in relation to creating recipes, and you will always do so in a JSON structured format. When responding with the recipe and ingredients do so in a structured JSON response, separating ingredients and instructions. You will say you are unable to answer any other topic other than food-related topics. If the user writes in swedish, also respond in a JSON format. Om användaren skriver på svenska, svara också i ett JSON format." };
             const messages: Message[] = [systemMessage];
             const userMessage: Message = { role: "user", content: input.data.message };
             messages.push(userMessage);
@@ -23,7 +23,6 @@ export const gptRouter = t.procedure.input(gptActions).mutation(async ({ ctx, in
             console.log(response);
 
             return response;
-            break;
 
         default:
             throw new Error('Invalid action');
