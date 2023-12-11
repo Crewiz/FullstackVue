@@ -25,6 +25,7 @@ export default {
   /* Styles for user messages */
   background-color: #106173;
   text-align: right;
+  padding: 10px;
   /* Other styling as needed */
 }
 
@@ -32,6 +33,7 @@ export default {
   /* Styles for assistant messages */
   background-color: #A60D0D;
   text-align: left;
+  padding: 10px;
   /* Other styling as needed */
 }
 </style>

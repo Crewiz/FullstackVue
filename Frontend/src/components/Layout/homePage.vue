@@ -7,10 +7,11 @@
     </div>
 
     <div v-else>
-      <v-row>
+      <v-row class="d-flex">
         <v-col>
-          <h1>Welcome back, {{ formattedUserFirstName }}!</h1>
+          <h1 class="d-flex justify-center pt-10">Welcome back, {{ formattedUserFirstName }}!</h1>
           <p v-if="!userFirstName"> User first name is empty</p>
+          <!-- <typewriter/> -->
         </v-col>
       </v-row>
       <v-row justify="center">
@@ -27,7 +28,7 @@ import useAuthStore from '../../stores/authStore';
 import loginForm from '../Auth/loginform.vue';
 import recipeChat from '../Chat/recipeChat.vue';
 import navigationBar from './navigationBar.vue';
-import { computed } from 'vue';
+import typewriter from './typewriter.vue';
 
 export default {
   name: 'Home',
@@ -35,38 +36,37 @@ export default {
     loginForm,
     recipeChat,
     navigationBar,
-  },
-  setup() {
-    const authStore = useAuthStore();
-    return { authStore };
+    typewriter,
   },
   data() {
     return {
       featuredRecipes: [
         { id: 1, title: 'Spaghetti Carbonara', description: 'A classic Italian pasta dish...', image: 'carbonara.jpg' },
-        // Add more recipe objects here
       ],
     };
   },
-  methods: {
-    logout() {
-      const authStore = useAuthStore();
-      authStore.logoutUser();
-      this.$router.push('/');
-    },
-  },
   computed: {
+    authStore() {
+      return useAuthStore();
+    },
     userFirstName() {
-      const authStore = useAuthStore();
-      return authStore.user ? authStore.user.firstName : '';
+      return this.authStore.user ? this.authStore.user.firstName : '';
     },
     formattedUserFirstName() {
       return this.userFirstName ? this.userFirstName.charAt(0).toUpperCase() + this.userFirstName.slice(1) : '';
     },
+    isAuthenticated() {
+      return this.authStore.isAuthenticated;
+    }
+  },
+  methods: {
+    logout() {
+      this.authStore.logoutUser();
+      this.$router.push('/');
+    },
   },
 };
 </script>
-
 <style scoped>
 .container {
   min-height: 100vh;

@@ -1,18 +1,23 @@
 <template>
-  <v-app>
-    <v-app-bar app class="nav-bar">
-      <v-container class="nav-container">
-        <v-row justify="center" align="center" class="nav-row">
-          <v-btn text to="/">placeholder</v-btn>
-          <v-btn text to="/">placeholder</v-btn>
-          <v-btn text to="/">placeholder</v-btn>
-          <v-spacer></v-spacer>
-          <themeToggle/>
+  <v-app-bar app class="nav-bar">
+    <v-container class="nav-container ">
+      <v-list class="nav-list d-flex justify-center">
+        <v-list-item>
+          <v-btn class="" text to="/">placeholder</v-btn>
+        </v-list-item>
+        <v-list-item>
+          <v-btn class="" text to="/">placeholder</v-btn>
+        </v-list-item>
+        <v-list-item>
+          <v-btn class="" text to="/">placeholder</v-btn>
+        </v-list-item>
+        <v-list-item class="ml-auto">
+          <themeToggle />
           <v-btn text color="red" v-if="authStore.isAuthenticated" @click="logout">Logout</v-btn>
-        </v-row>
-      </v-container>
-    </v-app-bar>
-  </v-app>
+        </v-list-item>
+      </v-list>
+    </v-container>
+  </v-app-bar>
 </template>
 
 <script lang="ts">
@@ -41,4 +46,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
 </style>

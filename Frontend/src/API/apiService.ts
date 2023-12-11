@@ -135,10 +135,6 @@ const apiService = {
       }
       throw new Error(axiosError.response?.data.message || 'An error occurred during API request to get assistant response');
     }
-  }
-  
-  
+  } 
 }
-
-
 export default apiService;
