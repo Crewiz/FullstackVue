@@ -13,6 +13,9 @@
         </v-list-item>
         <v-list-item class="ml-auto">
           <themeToggle />
+          <router-link v-if="authStore.isAuthenticated" to="/profile">
+            <v-btn class="" text>Profile</v-btn>
+          </router-link>
           <v-btn text color="red" v-if="authStore.isAuthenticated" @click="logout">Logout</v-btn>
         </v-list-item>
       </v-list>

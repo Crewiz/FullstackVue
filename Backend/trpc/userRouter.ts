@@ -19,6 +19,7 @@ const createUserInput = z.object({
     lastName: z.string(),
     email: z.string().email(),
     password: z.string(),
+    /* recipes: z.string().array() */
   }),
 });
 
@@ -39,6 +40,7 @@ const updateUserInput = z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     email: z.string().email().optional(),
+   /*  recipes: z.string().array().optional() */
     // You can add more fields here as needed
   }),
 });
@@ -53,6 +55,11 @@ const deleteUserInput = z.object({
 const getUserInput = z.object({
   action: z.literal('get'),
   id: z.number(),
+});
+
+//Validator for getting a user´s recipe
+const getUserRecipesInput = z.object ({
+  userId: z.number(),
 });
 
 // Union of all user action inputs
@@ -144,5 +151,7 @@ export const userRouter = t.procedure
         throw new Error('Invalid action');
     }
   });
+  
+  
 
 export type UserRouterType = typeof userRouter;

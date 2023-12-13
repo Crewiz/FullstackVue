@@ -17,7 +17,8 @@ model User {
   lastName  String?
   password  String
   timestamp DateTime @default(now())
-  posts     Post[] 
+  posts     Post[]
+  recipes   Recipe[]
 }
 
 model Post {
@@ -35,18 +36,16 @@ model Post {
 //   ADMIN
 // }
 
-// model Recipe {
-//   id          Int       @id @default(autoincrement())
-//   title       String
-//   description String
-//   ingredients String[] // You might want a separate model for Ingredients
-//   steps       String[]
-//   imageUrl    String?
-//   // ... other properties
-
-//   // Relationships
-//   author      User      @relation(fields: [authorId], references: [id])
-//   authorId    Int       // Foreign key to relate to the User who created the recipe
+model Recipe {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String @default("")
+  ingredients String // Serialized JSON string
+  steps       String // Serialized JSON string
+  // Relationships
+  author      User   @relation(fields: [authorId], references: [id])
+  authorId    Int // Foreign key to relate to the User who created the recipe
+}
 
 //   ratings     Rating[]  // One-to-many relationship with Rating model
 // }

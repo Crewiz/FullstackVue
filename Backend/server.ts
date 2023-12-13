@@ -12,8 +12,9 @@ const app = express();
 
 import { userRouter } from './trpc/userRouter';
 import { gptRouter } from './trpc/gptRouter';
+import { recipeRouter } from './trpc/recipeRouter';
 
-const appRouter= createAppRouter(userRouter, gptRouter);
+const appRouter= createAppRouter(userRouter, gptRouter, recipeRouter);
 
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} Request to ${req.originalUrl}`);
@@ -35,7 +36,7 @@ app.use('/trpc', createExpressMiddleware({
     },
   }));
 
-
+// ta bort?
 app.get('/', (req, res) => {
     res.send('Vue Fighters');
 });

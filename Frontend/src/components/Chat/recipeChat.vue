@@ -15,7 +15,7 @@
           :recipe-name="recipeName"
           :prep-time="prepTime" 
           :servings="servings" />
-
+        <v-btn>Review recipe</v-btn>
       </v-col>
     </v-row>
   </v-container>

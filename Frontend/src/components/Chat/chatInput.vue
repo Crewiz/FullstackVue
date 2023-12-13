@@ -1,7 +1,7 @@
 <template>
-  <v-form @submit.prevent="send">
+  <v-form class="input" @submit.prevent="send">
     <v-text-field v-model="input" label="Type a message" />
-    <v-btn type="submit">Send</v-btn>
+    <v-btn class="input-btn" type="submit">Send</v-btn>
   </v-form>
 </template>
 
@@ -20,3 +20,13 @@ export default {
   }
 };
 </script>
+
+<style>
+  .input {
+    display: flex;
+  }
+
+  .input-btn {
+    min-height: 55px;
+  }
+</style>

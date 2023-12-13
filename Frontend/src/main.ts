@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import homePage from './components/Layout/homePage.vue';
 // import loginForm from './components/Auth/loginForm.vue';
 import registrationForm from './components/Auth/registrationForm.vue';
+import userProfile from './components/user/userProfile.vue';
 
 
 // Vuetify
@@ -51,6 +52,11 @@ const routes: RouteRecordRaw[] = [
     path: '/register',
     name: 'register',
     component: registrationForm,
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: userProfile,
   },
   {
     path: '/:pathMatch(.*)*', // redirectar alla odefinerade routes till homepage
