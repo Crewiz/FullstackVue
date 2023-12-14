@@ -15,7 +15,7 @@
           :recipe-name="recipeName"
           :prep-time="prepTime"
           :servings="servings" />
-        <v-btn>Review recipe</v-btn>
+        <v-btn @click.prevent='reviewRecipe'>Review recipe</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -35,6 +35,7 @@
       prep_time: 'prepTime',
       PrepTime: 'prepTime',
       'Prep time': 'prepTime',
+      'Prep Time': 'prepTime'
       // Add other variations if needed
     };
 
@@ -69,6 +70,7 @@
       };
     },
     methods: {
+      
       scrollToBottom() {
         const chatContent = this.$refs.chatContent;
         chatContent.scrollTop = chatContent.scrollHeight;
@@ -117,6 +119,22 @@
         console.log('Adding message to the list:', message);
         this.messages.push(message); // Lägger till meddelandet längst bak i listan istället för längst fram
       },
+      reviewRecipe() {
+      // Assuming you're using Vue Router
+      console.log('recipeName:', this.recipeName);
+      console.log('ingredients:', this.ingredients);
+      console.log('instructions:', this.instructions);
+      
+      
+      this.$router.push({
+        name: 'recipeReview',
+        params: {
+          title: this.recipeName,
+          ingredients: JSON.stringify(this.ingredients),
+          steps: JSON.stringify(this.instructions),
+        },
+      });
+    },
     },
   };
 </script>

@@ -58,24 +58,41 @@ interface GptRecipeResponse {
 interface RecipeData {
   title: string;
   description: string;
-  ingredients: string[]; // ska det va array här?
-  steps: string[]; // Och här?
+  ingredients: string; // ska det va array här?
+  steps: string; // Och här?
   author: string
 }
 
-interface RecipeResponse {
-  result: {
-    data: {
-      recipe: {
-        title: string;
-        description: string;
-        ingredients: string[];
-        steps: string[];
-        author: string
-      },
-    }
-  }
+interface RecipeUpdateData {
+  title?: string;
+  description?: string;
+  ingredients?: string;
+  steps?: string;
+  // Include other fields that can be updated
 }
+
+interface RecipeActionRequest {
+  action: 'create' | 'update' | 'delete' | 'get' | 'getAll';
+  data?: RecipeData | RecipeUpdateData;
+  id?: number;
+}
+
+interface RecipeResponse {
+  recipe: {
+    id: number;
+    title: string;
+    description: string;
+    ingredients: string;
+    steps: string;
+    authorId: number;
+  };
+  // any other properties that might be part of the response
+}
+
+interface RecipesListResponse {
+  recipes: RecipeResponse[];
+}
+
 
 
 const apiService = {
@@ -180,8 +197,22 @@ const apiService = {
       }
       throw new Error(axiosError.response?.data.message || 'An error occurred during API request');
     }
-  } 
+  },
+
+  async getAllUserRecipes(userId: number): Promise<AxiosResponse<RecipesListResponse>> {
+    console.log(`getAllRecipes called with userId: ${userId}`);
+    try {
+        const response = await axios.get<RecipesListResponse>(`${BASE_URL}/recipe/${userId}/recipes`);
+        console.log('Response from getAllRecipes:', response.data);
+        return response;
+    } catch (error) {
+        const axiosError = error as AxiosError<ErrorResponse>;
+        console.error('Error fetching all recipes for user:', axiosError.message);
+        throw new Error(axiosError.response?.data.message || 'An error occurred during API request to fetch all recipes for user');
+    }
 }
+}
+
 
 
 export default apiService;

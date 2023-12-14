@@ -6,6 +6,7 @@ import homePage from './components/Layout/homePage.vue';
 // import loginForm from './components/Auth/loginForm.vue';
 import registrationForm from './components/Auth/registrationForm.vue';
 import userProfile from './components/user/userProfile.vue';
+import recipeReview from './components/Recipe/recipeReview.vue'
 
 
 // Vuetify
@@ -61,6 +62,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*', // redirectar alla odefinerade routes till homepage
     redirect: '/',
+  },
+  {
+    path: '/recipeReview',
+    name: 'recipeReview',
+    component: recipeReview,
+    props: true, // Pass route params as props to the component
   },
 ];
 

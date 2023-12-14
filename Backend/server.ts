@@ -4,6 +4,7 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { createAppRouter } from './trpc/router';
+import { decodeAndVerifyJwtToken } from './utility/jwtUtils';
 
 dotenv.config();
 
@@ -28,11 +29,22 @@ app.use(express.json());
 //tRPC middlewaregrejer
 app.use('/trpc', createExpressMiddleware({
     router: appRouter,
-    createContext: ({ req }) => {
-      console.log('Creating tRPC context');
+    createContext: async ({ req }) => {
+      console.log('Processing request for createContext...');
+      const token = req.headers.authorization?.split(' ')[1]
+      console.log('Extracted Token:', token);
+
+      let user = null;
+        if (token) {
+            user = await decodeAndVerifyJwtToken(token);
+            console.log('Decoded User:', user);
+        } else {
+            console.log('No token found in the request headers');
+        }
       return {
         db: prisma,
         req,
+        user,
       };
     },
   }));

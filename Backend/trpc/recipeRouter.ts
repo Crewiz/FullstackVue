@@ -54,7 +54,9 @@ const getRecipeInput = z.object({
   .or(updateRecipeInput)
   .or(deleteRecipeInput)
   .or(getAllRecipesInput)
-  .or(getRecipeInput);
+    .or(getRecipeInput)
+    .or(z.object({ action: z.literal('query'), authorId: z.number() })); // Lägg till detta för query
+
 
 
 
@@ -123,7 +125,7 @@ const getRecipeInput = z.object({
                     } catch (error) {
                         console.error("Error deleting recipe:", error);
                         throw new Error('Error deleting recipe.');
-                    }
+                    }           
         }});
 
         export type RecipeRouterType = typeof recipeRouter;

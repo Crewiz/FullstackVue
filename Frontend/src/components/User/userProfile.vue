@@ -1,118 +1,108 @@
 <template>
-    <div>
-      <navigationBar />
-      <div v-if="isAuthenticated && user">
-        <div class="profile">
-          <div class="profile-header">
-            <div class="avatar-container">
-              <div v-if="user.avatar" class="avatar">
-                <img :src="user.avatar" alt="Profile Picture">
-              </div>
-              <div v-else class="initials-avatar">
-                {{ userInitials }}
-              </div>
+  <div>
+    <navigationBar />
+    <div v-if="isAuthenticated && user">
+      <div class="profile">
+        <div class="profile-header">
+          <div class="avatar-container">
+            <div v-if="user.avatar" class="avatar">
+              <img :src="user.avatar" alt="Profile Picture" />
             </div>
-            <h1>{{ fullName }}</h1>
-            <h3>{{ user.email }}</h3>
+            <div v-else class="initials-avatar">
+              {{ userInitials }}
+            </div>
           </div>
+          <h1>{{ fullName }}</h1>
+          <h3>{{ user.email }}</h3>
+        </div>
 
-          <div class="profile-posts">
-            <h2>Inlägg</h2>
-            <ul class="post-container">
-              <li v-for="post in user.posts" :key="post.id">
-                {{ post.title }}
-                <!-- Add post details here if needed -->
-              </li>
-              <li>
-                <v-card
-                width="400"
-                title="This is a title"
-                subtitle="This is a subtitle"
-                text="This is content"
-                ></v-card>
-              </li>
-              <li>
-                <v-card
-                width="400"
-                title="This is a title"
-                subtitle="This is a subtitle"
-                text="This is content"
-                ></v-card>
-              </li>
-              <li>
-                <v-card
-                width="400"
-                title="This is a title"
-                subtitle="This is a subtitle"
-                text="This is content"
-                ></v-card>
-              </li>
-              <li>
-                <v-card
-                width="400"
-                title="This is a title"
-                subtitle="This is a subtitle"
-                text="This is content"
-                ></v-card>
-              </li>
-            </ul>
+        <div class="profile-posts">
+          <h2>Inlägg</h2>
+          <ul class="post-container" v-if="recipeStore.recipes">
+            <li v-for="recipe in recipeStore.recipes" :key="recipe.id">
+              {{ recipe.title }}
+              <!-- Add your card component here using recipe data -->
+            </li>
+          </ul>
+          <div v-else>
+            <p>Inga recept tillgängliga.</p>
           </div>
         </div>
       </div>
-      <div v-else>
-        <p>Du är inte inloggad.</p>
-        <!-- Eventuell annan logik eller meddelande för användare som inte är inloggade -->
-      </div>
     </div>
-  </template>
-  
-  <script>
-  import navigationBar from '../Layout/navigationBar.vue';
-  import useAuthStore from '../../stores/authStore';
-  
-  export default {
-    name: 'userProfile',
-    components: {
-      navigationBar,
+    <div v-else>
+      <p>Du är inte inloggad.</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import navigationBar from '../Layout/navigationBar.vue';
+import useAuthStore from '../../stores/authStore';
+import apiService from '../../API/apiService';
+import useRecipeStore from '../../stores/recipeStore';
+
+export default {
+  name: 'userProfile',
+  components: {
+    navigationBar,
+  },
+  data() {
+    return {
+      userInitials: '',
+    };
+  },
+  computed: {
+    isAuthenticated() {
+      return useAuthStore().isAuthenticated;
     },
-    data() {
-      return {
-        userInitials: '',
-      };
+    user() {
+      return useAuthStore().user || {};
     },
-    computed: {
-      isAuthenticated() {
-        return useAuthStore().isAuthenticated;
-      },
-      user() {
-        return useAuthStore().user || {};
-      },
-      fullName() {
-        // Display full name (if both first and last name are available)
-        return `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim();
-      },
+    fullName() {
+      return `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim();
     },
-    watch: {
-      user: {
-        immediate: true,
-        handler(newUser) {
-          // Update initials when the user changes
-          console.log('User object in watch:', newUser);
-          this.updateUserInitials(newUser);
-        },
-        deep: true, // Watch changes inside the user object
-      },
+    // Access recipes directly from the recipe store
+    recipeStore() {
+      return useRecipeStore();
     },
-    methods: {
-      updateUserInitials(user) {
-        // Create initials from first and last name
-        if (user.firstName && user.lastName) {
-          this.userInitials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+  },
+  created() {
+    if (this.isAuthenticated && this.user) {
+      this.fetchUserRecipes(this.user.id);
+    }
+  },
+  watch: {
+    user: {
+      immediate: true,
+      handler(newUser) {
+        this.updateUserInitials(newUser);
+        if (newUser && newUser.id) {
+          this.fetchUserRecipes(newUser.id);
         }
       },
+      deep: true,
     },
-  };
-  </script>
+  },
+  methods: {
+    updateUserInitials(user) {
+      if (user.firstName && user.lastName) {
+        this.userInitials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+      }
+    },
+    async fetchUserRecipes(userId) {
+      console.log(`fetchUserRecipes called with userId: ${userId}`);
+      try {
+        const response = await apiService.getAllUserRecipes(userId);
+        console.log('Response from fetchUserRecipes:', response.data);
+        useRecipeStore().setRecipes(response.data.recipes);
+      } catch (error) {
+        console.error('Error fetching user recipes in userProfile.vue:', error);
+      }
+    },
+  },
+};
+</script>
   
   <style scoped>
   .profile {
