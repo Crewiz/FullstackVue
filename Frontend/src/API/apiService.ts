@@ -49,15 +49,37 @@ interface ErrorResponse {
   message: string;
 }
 type ChatResponse = string;
-interface RecipeResponse {
+
+interface GptRecipeResponse {
   ingredients: string[];
   instructions: string[];
+}
 
+interface RecipeData {
+  title: string;
+  description: string;
+  ingredients: string[]; // ska det va array här?
+  steps: string[]; // Och här?
+  author: string
+}
+
+interface RecipeResponse {
+  result: {
+    data: {
+      recipe: {
+        title: string;
+        description: string;
+        ingredients: string[];
+        steps: string[];
+        author: string
+      },
+    }
+  }
 }
 
 
 const apiService = {
-  // Function to create a new user
+  // User Actions
   async createUser(userData: UserRegistrationData): Promise<AxiosResponse<UserResponse>> {
     try {
       console.log("Making API request with:", userData);
@@ -103,9 +125,8 @@ const apiService = {
     }
   },
 
-
-
-  async getAssistantResponse(message: string): Promise<ChatResponse | RecipeResponse> {
+  // Recipe bot actions
+  async getAssistantResponse(message: string): Promise<ChatResponse | GptRecipeResponse> {
     try {
       const response = await axios.post<string>(`${BASE_URL}/gpt`, {
         action: 'ask',
@@ -118,7 +139,7 @@ const apiService = {
         const jsonData = JSON.parse(response.data);
         // Check if it's a recipe response
         if (jsonData.ingredients && jsonData.instructions) {
-          return jsonData as RecipeResponse;
+          return jsonData as GptRecipeResponse;
         }
       } catch (error) {
         // If parsing fails, it's a regular chat response
@@ -135,6 +156,32 @@ const apiService = {
       }
       throw new Error(axiosError.response?.data.message || 'An error occurred during API request to get assistant response');
     }
+    
+  },
+  // Recipe Actions
+  async createRecipe(recipeData: RecipeData): Promise<AxiosResponse<RecipeResponse>> {
+    try {
+      console.log("Making API request with:", recipeData);
+      const response = await axios.post<RecipeResponse>(`${BASE_URL}/recipe`, {
+        action: 'create',
+        data: recipeData,
+      });
+      console.log("Request successful", response);
+      console.log("Recipe title:", response.data.recipe.title);
+      return response; // Return the whole response
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      console.error("Login  request failed with error:", axiosError.message);
+      if (axiosError.response) {
+        console.error("Status code:", axiosError.response.status);
+        console.error("Response data:", axiosError.response.data);
+      } else {
+        console.error("Error details:", axiosError);
+      }
+      throw new Error(axiosError.response?.data.message || 'An error occurred during API request');
+    }
   } 
 }
+
+
 export default apiService;

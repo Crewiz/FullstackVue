@@ -3,6 +3,7 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import { jwtVerificationMiddleware } from './jwtMiddleware';
 
 const prisma = new PrismaClient();
 
@@ -98,8 +99,12 @@ export const userRouter = t.procedure
           console.log('Generated JWT for new user', tokenForNewUser);
           console.log('User created:', createdUser);
           return { user: createdUser, token: tokenForNewUser };
-        } catch (error) {
+        } catch (error: unknown) {
+          if (error instanceof Error)
           console.error("Error in creating user:", error);
+          else {
+            console.error('Invalid token and error was not an instance of Error:', error)
+          }
           throw error; // Re-throw the error for further handling if necessary
         }
 
@@ -120,15 +125,25 @@ export const userRouter = t.procedure
         return { user: userToLogin, token: tokenForLogin };
 
       case 'update':
+        console.log('Attempting to update user...')
+        if (!ctx.user) {
+          console.log('Authentication required, no user in context'); 
+          throw new Error('Authentication required');
+        }
+        console.log('Authenticated user:', ctx.user);
         console.log('Update data:', input.data, 'ID:', input.id);
         // Handle update user logic here
         const updatedUser = await db.user.update({
           where: { id: input.id },
           data: input.data,
         });
+        console.log('User updated:', updatedUser); 
         return updatedUser;
 
       case 'delete':
+        if (!ctx.user) {
+          throw new Error('Authentication required');
+        }
         console.log('Delete ID:', input.id);
         // Handle delete user logic here
         await db.user.delete({
@@ -137,6 +152,7 @@ export const userRouter = t.procedure
         return { success: true };
 
       case 'get':
+
         console.log('Get ID:', input.id);
         // Handle get user logic here
         const user = await db.user.findUnique({

@@ -1,16 +1,17 @@
 import { initTRPC } from '@trpc/server';
 import { PrismaClient } from '@prisma/client'
+import { Request } from 'express';
 import { UserRouterType } from './userRouter';
 import { GptRouterType } from './gptRouter';
 import { RecipeRouterType} from './recipeRouter';
 
-
-
-export const t = initTRPC.context<Context>().create();
-
 export interface Context {
   db: PrismaClient;
+  req: Request; 
+  user?: any;
 }
+
+export const t = initTRPC.context<Context>().create();
 
 //main router som kombinerar alla sub-routers
 export const createAppRouter = (userRouter: UserRouterType, gptRouter: GptRouterType, recipeRouter: RecipeRouterType) => {
@@ -23,5 +24,4 @@ export const createAppRouter = (userRouter: UserRouterType, gptRouter: GptRouter
     });
   };
   
-
 export type AppRouter = ReturnType<typeof createAppRouter>;

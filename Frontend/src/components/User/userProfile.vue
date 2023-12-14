@@ -67,7 +67,7 @@
   </template>
   
   <script>
-  import navigationBar from '../layout/navigationBar.vue';
+  import navigationBar from '../Layout/navigationBar.vue';
   import useAuthStore from '../../stores/authStore';
   
   export default {

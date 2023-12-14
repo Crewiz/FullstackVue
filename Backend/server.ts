@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import dotenv from 'dotenv';
@@ -16,7 +16,7 @@ import { recipeRouter } from './trpc/recipeRouter';
 
 const appRouter= createAppRouter(userRouter, gptRouter, recipeRouter);
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(`${new Date().toISOString()} - ${req.method} Request to ${req.originalUrl}`);
     console.log('Request Body:', req.body);
     next();
@@ -28,18 +28,14 @@ app.use(express.json());
 //tRPC middlewaregrejer
 app.use('/trpc', createExpressMiddleware({
     router: appRouter,
-    createContext: () => {
+    createContext: ({ req }) => {
       console.log('Creating tRPC context');
       return {
         db: prisma,
+        req,
       };
     },
   }));
-
-// ta bort?
-app.get('/', (req, res) => {
-    res.send('Vue Fighters');
-});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
