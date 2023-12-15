@@ -67,7 +67,7 @@ const getRecipeInput = z.object({
             console.log('Received input:', input);
 
             const { db } = ctx;
-
+            db.post
            
 
             switch (input.action){

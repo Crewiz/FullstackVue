@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import { ChatCompletionMessageParam } from "openai/resources";
 
 dotenv.config();
 
@@ -7,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function getOpenAIResponse(messages: Message[]): Promise<string | null> {
+export async function getOpenAIResponse(messages: ChatCompletionMessageParam[]): Promise<string | null> {
   try {
     const completion = await openai.chat.completions.create({
       messages,
@@ -20,9 +21,3 @@ export async function getOpenAIResponse(messages: Message[]): Promise<string | n
     return "I'm sorry, but I encountered an error.";
   }
 }
-
-export type Message = {
-  role: "user" | "assistant" | "system";
-  content: string | null;
-};
-

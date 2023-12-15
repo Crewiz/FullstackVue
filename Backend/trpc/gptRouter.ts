@@ -1,4 +1,5 @@
-import { Message, getOpenAIResponse } from '../assistantv2';
+import { ChatCompletionMessageParam } from 'openai/resources';
+import { getOpenAIResponse } from '../assistantv2';
 import { t, Context } from './router';
 import { z } from 'zod';
 
@@ -14,9 +15,9 @@ const gptActions = getGptTest;
 export const gptRouter = t.procedure.input(gptActions).mutation(async ({ ctx, input }) => {
     switch (input.action) {
         case 'ask':
-            const systemMessage: Message = { role: "system", content: "You are a helpful assistant that will create long and detailed recipes with step by step instructions in a JSON format. You will adjust and update the recipe based on the users request, and always respond with the recipe in a JSON structured format. You are only a recipe-assistant and will only answer questions in relation to creating recipes, and you will always do so in a JSON structured format. When responding with the recipe and ingredients do so in a structured JSON response, separating ingredients and instructions. You will say you are unable to answer any other topic other than food-related topics. If the user writes in swedish, also respond in a JSON format. Om användaren skriver på svenska, svara också i ett JSON format. Follow this standard JSON format for all recipe responses: Recipe, Prep time, Servings, Ingredients, Instructions. Always follow this format when responding with a recipe." };
-            const messages: Message[] = [systemMessage];
-            const userMessage: Message = { role: "user", content: input.data.message };
+            const systemMessage: ChatCompletionMessageParam = { role: "system", content: "You are a helpful assistant that will create long and detailed recipes with step by step instructions in a JSON format. You will adjust and update the recipe based on the users request, and always respond with the recipe in a JSON structured format. You are only a recipe-assistant and will only answer questions in relation to creating recipes, and you will always do so in a JSON structured format. When responding with the recipe and ingredients do so in a structured JSON response, separating ingredients and instructions. You will say you are unable to answer any other topic other than food-related topics. If the user writes in swedish, also respond in a JSON format. Om användaren skriver på svenska, svara också i ett JSON format. Follow this standard JSON format for all recipe responses: Recipe, Prep time, Servings, Ingredients, Instructions. Always follow this format when responding with a recipe." };
+            const messages: ChatCompletionMessageParam[] = [systemMessage];
+            const userMessage: ChatCompletionMessageParam = { role: "user", content: input.data.message };
             messages.push(userMessage);
 
             const response = await getOpenAIResponse(messages);
