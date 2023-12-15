@@ -19,9 +19,9 @@
         <div class="profile-posts">
           <h2>Inlägg</h2>
           <ul class="post-container" v-if="recipeStore.recipes">
-            <li v-for="recipe in recipeStore.recipes" :key="recipe.id">
-              {{ recipe.title }}
-              <!-- Add your card component here using recipe data -->
+            <li class="recipe-container" v-for="recipe in recipeStore.recipes" :key="recipe.id">
+              <h1>{{ recipe.title }}</h1>
+              <h2>{{ recipe.description }}</h2>
             </li>
           </ul>
           <div v-else>
@@ -91,11 +91,11 @@ export default {
       }
     },
     async fetchUserRecipes(userId) {
-      console.log(`fetchUserRecipes called with userId: ${userId}`);
       try {
         const response = await apiService.getAllUserRecipes(userId);
-        console.log('Response from fetchUserRecipes:', response.data);
-        useRecipeStore().setRecipes(response.data.recipes);
+        const store = useRecipeStore();
+        store.setRecipes(response);
+        console.log('Recipes:', store.recipes, response);
       } catch (error) {
         console.error('Error fetching user recipes in userProfile.vue:', error);
       }
@@ -132,7 +132,6 @@ export default {
     width: 100%;
     min-height: auto;
   }
-
   .profile-posts li {
     list-style: none;
     margin: 25px;
@@ -140,8 +139,18 @@ export default {
 
   .post-container {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
-  
+
+  .recipe-container {
+    width: 350px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+  }
+
+
   .avatar-container {
     position: relative;
     width: 80px;
@@ -149,13 +158,13 @@ export default {
     border-radius: 50%;
     overflow: hidden;
   }
-  
+
   .avatar {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   .initials-avatar {
     display: flex;
     align-items: center;
@@ -167,5 +176,10 @@ export default {
     background-color: #007BFF; /* You can change the background color here */
     border-radius: 50%;
   }
+
+  .recipe-container {
+    border: 2px solid black;
+  }
+
   </style>
   

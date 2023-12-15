@@ -89,8 +89,10 @@ interface RecipeResponse {
   // any other properties that might be part of the response
 }
 
-interface RecipesListResponse {
-  recipes: RecipeResponse[];
+type TrpcResult<T> = {
+  result: {
+    data: T;
+  }
 }
 
 
@@ -199,12 +201,14 @@ const apiService = {
     }
   },
 
-  async getAllUserRecipes(userId: number): Promise<AxiosResponse<RecipesListResponse>> {
+  async getAllUserRecipes(userId: number): Promise<RecipeResponse[]> {
     console.log(`getAllRecipes called with userId: ${userId}`);
     try {
-        const response = await axios.get<RecipesListResponse>(`${BASE_URL}/recipe/${userId}/recipes`);
-        console.log('Response from getAllRecipes:', response.data);
-        return response;
+      const response = await axios.post<TrpcResult<RecipeResponse[]>>(`${BASE_URL}/recipe`, {
+        action: 'getUserRecipes',
+        });
+        console.log('Response from getAllRecipes:', response.data.result.data);
+      return response.data.result.data;
     } catch (error) {
         const axiosError = error as AxiosError<ErrorResponse>;
         console.error('Error fetching all recipes for user:', axiosError.message);

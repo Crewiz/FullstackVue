@@ -7,11 +7,6 @@ import { jwtVerificationMiddleware } from './jwtMiddleware';
 
 const prisma = new PrismaClient();
 
-// validator for default action
-const defaultActionInput = z.object({
-  action: z.literal('default'), // You can choose any action name you like
-});
-
 // Validator for creating a user
 const createUserInput = z.object({
   action: z.literal('create'),
@@ -20,7 +15,6 @@ const createUserInput = z.object({
     lastName: z.string(),
     email: z.string().email(),
     password: z.string(),
-    /* recipes: z.string().array() */
   }),
 });
 
@@ -36,31 +30,21 @@ const loginUserInput = z.object({
 // Validator for updating a user
 const updateUserInput = z.object({
   action: z.literal('update'),
-  id: z.number(),
   data: z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     email: z.string().email().optional(),
-   /*  recipes: z.string().array().optional() */
-    // You can add more fields here as needed
   }),
 });
 
 // Validator for deleting a user
 const deleteUserInput = z.object({
   action: z.literal('delete'),
-  id: z.number(),
 });
 
 // Validator for getting a user
 const getUserInput = z.object({
   action: z.literal('get'),
-  id: z.number(),
-});
-
-//Validator for getting a user´s recipe
-const getUserRecipesInput = z.object ({
-  userId: z.number(),
 });
 
 // Union of all user action inputs
@@ -108,7 +92,6 @@ export const userRouter = t.procedure
           throw error; // Re-throw the error for further handling if necessary
         }
 
-
       case 'login':
         const userToLogin = await db.user.findUnique({
           where: { email: input.data.email }
@@ -131,10 +114,10 @@ export const userRouter = t.procedure
           throw new Error('Authentication required');
         }
         console.log('Authenticated user:', ctx.user);
-        console.log('Update data:', input.data, 'ID:', input.id);
+        console.log('Update data:', input.data, 'ID:', ctx.user.userId);
         // Handle update user logic here
         const updatedUser = await db.user.update({
-          where: { id: input.id },
+          where: { id: ctx.user.userId },
           data: input.data,
         });
         console.log('User updated:', updatedUser); 
@@ -144,19 +127,19 @@ export const userRouter = t.procedure
         if (!ctx.user) {
           throw new Error('Authentication required');
         }
-        console.log('Delete ID:', input.id);
+        console.log('Delete ID:', ctx.user.userId);
         // Handle delete user logic here
         await db.user.delete({
-          where: { id: input.id },
+          where: { id: ctx.user.userId },
         });
         return { success: true };
 
       case 'get':
 
-        console.log('Get ID:', input.id);
+        console.log('Get ID:', ctx.user.userId);
         // Handle get user logic here
         const user = await db.user.findUnique({
-          where: { id: input.id },
+          where: { id: ctx.user.userId },
         });
         if (!user) {
           throw new Error('User not found');

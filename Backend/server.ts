@@ -31,6 +31,8 @@ app.use('/trpc', createExpressMiddleware({
     router: appRouter,
     createContext: async ({ req }) => {
       console.log('Processing request for createContext...');
+      console.log("pre-extracted-token:", req.headers.authorization);
+      
       const token = req.headers.authorization?.split(' ')[1]
       console.log('Extracted Token:', token);
 
