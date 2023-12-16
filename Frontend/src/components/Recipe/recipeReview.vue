@@ -2,58 +2,38 @@
   <v-container>
     <h1>Review Recipe</h1>
     <v-form @submit.prevent="handleSubmit">
-      <v-text-field
-        label="Recipe Title"
-        v-model="title"
-        required
-      ></v-text-field>
-
-      <v-textarea
-        label="Description"
-        v-model="description"
-        required
-      ></v-textarea>
-
-      <v-textarea
-        label="Ingredients "
-        v-model="ingredientsString"
-        required
-      ></v-textarea>
-
-      <v-textarea
-        label="Preparation Steps "
-        v-model="stepsString"
-        required
-      ></v-textarea>
-
+      <div>{{ title }}</div>
+      <div v-for="steps in description">{{ steps }}</div>
+      <div v-for="ingredient in ingredients">{{ ingredient }}</div>
       <v-btn color="primary" type="submit">Save Recipe</v-btn>
     </v-form>
   </v-container>
 </template>
-  
-  <script>
+
+<script>
+  import useRecipeStore from '../../stores/recipeStore';
   export default {
-    props: {
+    /* props: {
       title: String,
       ingredients: String,
       steps: String,
-    },
+    }, */
     data() {
       return {
         // Initialize data properties to store received props
         // Ensure they match the prop names
-        title: '',
-        description: '',
-        ingredients: [],
+        title: useRecipeStore().getRecipe.title,
+        description: useRecipeStore().getRecipe.instructions,
+        ingredients: useRecipeStore().getRecipe.ingredients,
         steps: [],
       };
     },
     mounted() {
       // Assign received props to component's data
-      this.title = this.$route.params.title;
-      this.description = this.$route.params.description;
-      this.ingredients = this.$route.params.ingredients;
-      this.steps = this.$route.params.steps;
+      const recipeStore = useRecipeStore();
+      console.log(recipeStore.getRecipe.title);
+      console.log(recipeStore.getRecipe.instructions);
+      console.log(recipeStore.getRecipe.ingredients);
     },
     methods: {
       handleSubmit() {
@@ -62,5 +42,4 @@
       },
     },
   };
-  </script>
-  
+</script>

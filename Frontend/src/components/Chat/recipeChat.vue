@@ -15,7 +15,7 @@
           :recipe-name="recipeName"
           :prep-time="prepTime"
           :servings="servings" />
-        <v-btn @click.prevent='reviewRecipe'>Review recipe</v-btn>
+        <v-btn @click.prevent="reviewRecipe">Review recipe</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -28,6 +28,8 @@
   import ChatInput from './chatInput.vue';
   import apiService from '../../API/apiService.ts';
 
+  import useRecipeStore from '../../stores/recipeStore';
+
   function normalizeRecipeData(data: Record<string, any>): Record<string, any> {
     const normalizedData: Record<string, any> = {};
 
@@ -35,7 +37,7 @@
       prep_time: 'prepTime',
       PrepTime: 'prepTime',
       'Prep time': 'prepTime',
-      'Prep Time': 'prepTime'
+      'Prep Time': 'prepTime',
       // Add other variations if needed
     };
 
@@ -62,15 +64,14 @@
     data() {
       return {
         messages: [],
-        ingredients: [],
-        instructions: [],
-        recipeName: '',
+        ingredients: [] as string[],
+        instructions: [] as string[],
+        recipeName: '' as string,
         prepTime: '',
         servings: '',
       };
     },
     methods: {
-      
       scrollToBottom() {
         const chatContent = this.$refs.chatContent;
         chatContent.scrollTop = chatContent.scrollHeight;
@@ -120,21 +121,24 @@
         this.messages.push(message); // Lägger till meddelandet längst bak i listan istället för längst fram
       },
       reviewRecipe() {
-      // Assuming you're using Vue Router
-      console.log('recipeName:', this.recipeName);
-      console.log('ingredients:', this.ingredients);
-      console.log('instructions:', this.instructions);
-      
-      
-      this.$router.push({
-        name: 'recipeReview',
-        params: {
+        // Assuming you're using Vue Router
+        console.log('recipeName:', this.recipeName);
+        console.log('ingredients:', this.ingredients);
+        console.log('instructions:', this.instructions);
+
+        const recipeStore = useRecipeStore();
+        const recipe = {
           title: this.recipeName,
-          ingredients: JSON.stringify(this.ingredients),
-          steps: JSON.stringify(this.instructions),
-        },
-      });
-    },
+          ingredients: this.ingredients,
+          instructions: this.instructions,
+        };
+        recipeStore.setRecipe(recipe);
+        console.log('stored recipe:', recipe);
+
+        this.$router.push({
+          name: 'recipeReview',
+        });
+      },
     },
   };
 </script>
