@@ -1,18 +1,27 @@
 <template>
   <v-container>
-    <h1>Review Recipe</h1>
+    <h1 class="text-h3">Review Recipe</h1>
     <v-form @submit.prevent="handleSubmit">
-      <div>{{ title }}</div>
-      <div v-for="steps in description">{{ steps }}</div>
-      <div v-for="ingredient in ingredients">{{ ingredient }}</div>
+      <div class="text-h4">{{ title }}</div>
+      <v-list lines="one" tag="ol">
+        <v-list-item v-for="(steps, index) in description">
+          {{ index + 1 }}. {{ steps }}
+          <v-btn color="primary">Edit</v-btn>
+        </v-list-item>
+      </v-list>
+      <v-list lines="one" tag="ul">
+        <h5>Ingredients:</h5>
+        <v-list-item v-for="ingredient in ingredients"> {{ ingredient }}</v-list-item>
+      </v-list>
       <v-btn color="primary" type="submit">Save Recipe</v-btn>
     </v-form>
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+  import { defineComponent } from 'vue';
   import useRecipeStore from '../../stores/recipeStore';
-  export default {
+  export default defineComponent({
     /* props: {
       title: String,
       ingredients: String,
@@ -26,6 +35,9 @@
         description: useRecipeStore().getRecipe.instructions,
         ingredients: useRecipeStore().getRecipe.ingredients,
         steps: [],
+        isEditable: false,
+        editableTitle: '',
+        editableDescription: [] as string[],
       };
     },
     mounted() {
@@ -41,5 +53,5 @@
         // You can access the modified data in this.title, this.description, etc.
       },
     },
-  };
+  });
 </script>
