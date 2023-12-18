@@ -1,13 +1,12 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { createPinia } from 'pinia'
+import { createPinia } from 'pinia';
 import homePage from './components/Layout/homePage.vue';
 // import loginForm from './components/Auth/loginForm.vue';
 import registrationForm from './components/Auth/registrationForm.vue';
 import userProfile from './components/user/userProfile.vue';
-import recipeReview from './components/Recipe/recipeReview.vue'
-
+import recipeReview from './components/Recipe/recipeReview.vue';
 
 // Vuetify
 import 'vuetify/styles';
@@ -23,20 +22,20 @@ const vuetify = createVuetify({
     themes: {
       dark: {
         colors: {
-          primary: '#8D6C68', 
-          secondary: '#4E523D', 
-          accent: '#647557', 
+          primary: '#8D6C68',
+          secondary: '#4E523D',
+          accent: '#647557',
           background: '#060404',
-          text: '#F0EBEA'
+          text: '#F0EBEA',
         },
       },
       light: {
         colors: {
-          primary: '#987773', 
-          secondary: '#BFC3AD', 
-          accent: '#98A98A', 
+          primary: '#987773',
+          secondary: '#BFC3AD',
+          accent: '#98A98A',
           background: '#FBF9F9',
-          text: '#140F0E'
+          text: '#140F0E',
         },
       },
     },
@@ -67,7 +66,6 @@ const routes: RouteRecordRaw[] = [
     path: '/recipeReview',
     name: 'recipeReview',
     component: recipeReview,
-    props: true, // Pass route params as props to the component
   },
 ];
 
