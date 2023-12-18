@@ -4,21 +4,29 @@
       <v-col class="chat-container d-flex flex-column">
         <v-card class="chat-content" ref="chatContent">
           <message-list :messages="messages" />
+          <div v-if="isLoading" class="loading"></div>
         </v-card>
         <chat-input @sendMessage="handleSendMessage" />
       </v-col>
-      <v-col cols="4">
+
+      <v-col v-if="ingredients.length" cols="4">
         <!-- Sidebar for ingredients -->
         <ingredients-list
-          v-if="ingredients.length"
           :ingredients="ingredients"
           :recipe-name="recipeName"
           :prep-time="prepTime"
-          :servings="servings" />
-        <v-btn @click.prevent="reviewRecipe">Review recipe</v-btn>
+          :servings="servings"
+        />
+        <v-btn class="review-button" @click.prevent="reviewRecipe">Review recipe</v-btn>
       </v-col>
+      <v-col v-else>
+        <h1>Oh no 😢</h1>
+      </v-col>
+      
+
     </v-row>
   </v-container>
+  <div v-if="isLoading">loadingtest</div>
 </template>
 
 <script lang="ts">
@@ -69,6 +77,7 @@
         recipeName: '' as string,
         prepTime: '',
         servings: '',
+        isLoading: false,
       };
     },
     methods: {
@@ -78,10 +87,12 @@
       },
       async handleSendMessage(userMessage: string) {
         this.addMessage({ role: 'user', content: userMessage });
-
+        this.setLoading(true)
         try {
           const response = await apiService.getAssistantResponse(userMessage);
-
+          console.log(this.isLoading);
+          
+          
           if (response && response.result && typeof response.result.data === 'string') {
             const recipeData = JSON.parse(response.result.data);
             const normalizedRecipeData = normalizeRecipeData(recipeData);
@@ -109,11 +120,19 @@
           this.addMessage({ role: 'system', content: 'Sorry, there was an error processing your request.' });
           this.ingredients = [];
           this.instructions = [];
+        } finally {
+          console.log(this.isLoading);
+          
+          this.setLoading(false)
+          console.log(this.isLoading);
         }
 
         this.$nextTick(() => {
           this.scrollToBottom();
         });
+      },
+      setLoading(value: boolean){
+        this.isLoading = value
       },
 
       addMessage(message: { role: string; content: string }) {
@@ -153,6 +172,7 @@
     height: calc(100vh - 250px);
     overflow-y: auto;
     position: relative;
+    max-width: 65%;
   }
 
   .chat-content {
@@ -161,6 +181,16 @@
     display: flex;
     flex-direction: column-reverse; /* Ändrad riktning för att chatten ska börja längst ner och röra sig uppåt */
   }
+  .loading {
+  background: transparent url('https://miro.medium.com/max/882/1*9EBHIOzhE1XfMYoKz1JcsQ.gif') center no-repeat;
+  height: 400px;
+  width: 400px;
+  margin-left: 380px;
+  text-align: center;
+}
 
+  .review-button {
+    margin-top: 20px;
+  }
   /* Lägg till andra stilar efter behov */
 </style>

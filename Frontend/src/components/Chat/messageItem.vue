@@ -13,7 +13,8 @@ export default {
     messageClass() {
       return {
         'user-message': this.message.role === 'user',
-        'assistant-message': this.message.role === 'assistant'
+        'assistant-message': this.message.role === 'assistant',
+        'dark-theme': this.$vuetify.theme.dark,
       };
     }
   }
@@ -21,21 +22,35 @@ export default {
 </script>
 
 <style>
-.user-message {
-  /* Styles for user messages */
-  background-color: #4e4e4e;
-  color: rgb(255, 255, 255);
-  text-align: right;
+.user-message, .assistant-message {
   padding: 10px;
-  /* Other styling as needed */
+  border-radius: 10px;
+  text-align: left;
+}
+
+.user-message {
+  --message-background: var(--v-theme-background); /* Lighter/darker based on theme */
+  --message-color: var(--v-theme-on-background);
 }
 
 .assistant-message {
-  /* Styles for assistant messages */
-  background-color: #181818;
-  text-align: left;
-  color: rgb(193, 191, 191);
-  padding: 10px;
-  /* Other styling as needed */
+  --message-background: var(--v-theme-surface); /* Lighter/darker based on theme */
+  --message-color: var(--v-theme-on-surface);
+}
+
+.dark-theme .user-message, .dark-theme .assistant-message {
+  --message-background: var(--v-theme-surface); /* Adjust for dark theme */
+  --message-color: var(--v-theme-on-surface);
+}
+
+.user-message {
+  background-color: var(--message-background);
+  color: var(--message-color);
+  text-align: right; /* Align user messages to right */
+}
+
+.assistant-message {
+  background-color: var(--message-background);
+  color: var(--message-color);
 }
 </style>

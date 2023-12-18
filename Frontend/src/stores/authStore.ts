@@ -3,6 +3,7 @@ import apiService from '../API/apiService';
 import axios from 'axios';
 
 interface User {
+    id: number;
     email: string;
     name: string;
     firstname?: string;
@@ -12,10 +13,17 @@ interface User {
 const useAuthStore = defineStore({
     id: 'auth',
     state: () => ({
-        isAuthenticated: false as boolean,
+        isAuthenticated: localStorage.getItem('jwt') ? true : false,
         user: null as User | null,
     }),
     actions: {
+        // Meto för att reinitialize auth state
+        initializeAuthState() {
+            const token = localStorage.getItem('jwt');
+            if (token) {
+                this.isAuthenticated = true;
+            }
+        },
         loginUser(user: User, token: string) {
             this.isAuthenticated = true;
             this.user = user;

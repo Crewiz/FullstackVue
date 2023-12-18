@@ -59,8 +59,8 @@ interface RecipeData {
   title: string;
   description: string;
   ingredients: string; // ska det va array här?
-  steps: string; // Och här?
-  author: string
+  steps: string;
+  authorId: number | undefined
 }
 
 interface RecipeUpdateData {
@@ -180,22 +180,29 @@ const apiService = {
   // Recipe Actions
   async createRecipe(recipeData: RecipeData): Promise<AxiosResponse<RecipeResponse>> {
     try {
-      console.log("Making API request with:", recipeData);
+      console.log(`Making API request to ${BASE_URL}/recipe with data:`, recipeData);
+
       const response = await axios.post<RecipeResponse>(`${BASE_URL}/recipe`, {
         action: 'create',
         data: recipeData,
       });
-      console.log("Request successful", response);
+
+      console.log("Request successful, statuscode:", response);
       console.log("Recipe title:", response.data.recipe.title);
+
       return response; // Return the whole response
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
-      console.error("Login  request failed with error:", axiosError.message);
+
+      console.error("Failed uploading recipe:", axiosError.message);
+
       if (axiosError.response) {
         console.error("Status code:", axiosError.response.status);
         console.error("Response data:", axiosError.response.data);
+      } else if (axiosError.request) {
+        console.error("Error with the request made:", axiosError.request);
       } else {
-        console.error("Error details:", axiosError);
+        console.error("Non-request, non-response error:", axiosError);
       }
       throw new Error(axiosError.response?.data.message || 'An error occurred during API request');
     }
@@ -216,7 +223,5 @@ const apiService = {
     }
 }
 }
-
-
 
 export default apiService;

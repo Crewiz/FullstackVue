@@ -1,6 +1,6 @@
 import { t } from './router'
 import { z } from 'zod'
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -76,7 +76,13 @@ export const recipeRouter = t.procedure
                     return newRecipe;
                 } catch (error) {
                     console.error("Error creating recipe:", error);
-                    throw new Error('Error creating new recipe.')
+                    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                        console.error("Prisma error details:", error.meta);
+                  } else if (error instanceof Error) {
+                    console.error("general error details:", error.message);
+                  }
+                  throw new Error('Error creating new recipe.')
+                
                 }
 
             case 'update':

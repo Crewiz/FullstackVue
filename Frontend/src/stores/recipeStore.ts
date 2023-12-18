@@ -22,7 +22,7 @@ const useRecipeStore = defineStore({
     recipe: {} as CreateRecipeInterface,
   }),
   getters: {
-    getRecipe() {
+    getRecipe(): CreateRecipeInterface {
       return this.recipe;
     },
   },
