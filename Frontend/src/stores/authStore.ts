@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import apiService from '../API/apiService';
 import axios from 'axios';
 
 interface User {
@@ -13,15 +12,17 @@ interface User {
 const useAuthStore = defineStore({
     id: 'auth',
     state: () => ({
-        isAuthenticated: localStorage.getItem('jwt') ? true : false,
+        isAuthenticated: false,
         user: null as User | null,
     }),
     actions: {
-        // Meto för att reinitialize auth state
         initializeAuthState() {
             const token = localStorage.getItem('jwt');
+            const userInfo = localStorage.getItem('user');
+
             if (token) {
                 this.isAuthenticated = true;
+                this.user = userInfo ? JSON.parse(userInfo) : null;
             }
         },
         loginUser(user: User, token: string) {
@@ -29,6 +30,7 @@ const useAuthStore = defineStore({
             this.user = user;
             try {
                 localStorage.setItem('jwt', token);
+                localStorage.setItem('user', JSON.stringify(user));
             } catch (error) {
                 console.error('Failed to set item in localStorage', error)
             }
@@ -37,6 +39,7 @@ const useAuthStore = defineStore({
             this.isAuthenticated = false;
             this.user = null;
             localStorage.removeItem('jwt');
+            localStorage.removeItem('user');
         },
     },
 });
@@ -47,7 +50,7 @@ axios.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${token}`
     }
     return config;
-  }, (error) => {
+}, (error) => {
     return Promise.reject(error);
 })
 

@@ -5,12 +5,12 @@
 </template>
 
 <script>
-  import MessageItem from './messageItem.vue';
+import MessageItem from './messageItem.vue';
 
-  export default {
-    components: { MessageItem },
-    props: {
-      messages: Array,
-    },
-  };
+export default {
+  components: { MessageItem },
+  props: {
+    messages: Array
+  }
+};
 </script>

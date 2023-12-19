@@ -1,17 +1,13 @@
 <template>
-  <v-btn @click="toggleTheme">
-  Toggle Theme</v-btn>
+  <v-btn @click="toggleTheme">Toggle Theme</v-btn>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useTheme } from 'vuetify';
+import { useThemeStore } from '../../stores/themeStore';
 
-const theme = useTheme();
-const darkMode = ref(false);
+const themeStore = useThemeStore();
 
 const toggleTheme = () => {
-  darkMode.value = !darkMode.value;
-  theme.global.name.value = darkMode.value ? "dark" : "light";
+  themeStore.toggleTheme();
 };
 </script>

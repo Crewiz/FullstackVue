@@ -16,9 +16,9 @@
           <h3>{{ user.email }}</h3>
         </v-col>
 
-        <!-- Include the PostsList component here -->
-        <v-col>
-          <userRecipes :recipes="recipeStore.recipes" :openRecipeDialog="openRecipeDialog" />
+        <v-col class="user-recipes">
+          <!-- Pass reversed recipes to userRecipes component -->
+          <userRecipes :recipes="reversedRecipes" :openRecipeDialog="openRecipeDialog" />
         </v-col>
       </v-row>
     </v-container>
@@ -28,28 +28,31 @@
       </v-col>
     </v-row>
 
-    <!-- Recipe Dialog -->
     <v-dialog v-model="recipeDialog" class="recipe-modal">
-      <v-card>
-        <v-card-text>
-          <h1>{{ selectedRecipe.title }}</h1>
-          <div>
-            <h4>Ingredients:</h4>
-            <p>{{ formattedIngredients }}</p> <!-- Use formatted ingredients -->
-          </div>
-          <div>
-            <h4>Steps:</h4>
-            <ol>
-              <li v-for="(step, index) in formattedSteps" :key="index">{{ step }}</li>
-            </ol> <!-- Display steps as an ordered list -->
-          </div>
-          <!-- Add other recipe details here -->
-        </v-card-text>
-        <v-card-actions>
-          <v-btn @click="closeRecipeDialog">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <v-card>
+    <v-card-text>
+      <h1>{{ selectedRecipe.title }}</h1>
+      <div>
+        <h4>Ingredients:</h4>
+        <ul class="ingredients-list">
+          <li v-for="(ingredient, index) in formattedIngredients" :key="index">{{ ingredient }}</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Steps:</h4>
+        <ol>
+          <li class="steps-list" v-for="(step, index) in formattedSteps" :key="index">{{ step }}</li>
+        </ol>
+      </div>
+      <!-- Add other recipe details here -->
+
+      <!-- Delete Recipe button -->
+    </v-card-text>
+    <v-btn color="error" @click="deleteRecipe">Delete Recipe</v-btn>
+
+  </v-card>
+</v-dialog>
+
   </div>
 </template>
 
@@ -58,13 +61,13 @@ import navigationBar from '../Layout/navigationBar.vue';
 import useAuthStore from '../../stores/authStore';
 import apiService from '../../API/apiService';
 import useRecipeStore from '../../stores/recipeStore';
-import userRecipes from './userRecipes.vue'; // Import the PostsList component
+import userRecipes from './userRecipes.vue';
 
 export default {
   name: 'userProfile',
   components: {
     navigationBar,
-    userRecipes, // Add the PostsList component to the components section
+    userRecipes,
   },
   data() {
     return {
@@ -83,16 +86,18 @@ export default {
     fullName() {
       return `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim();
     },
-    // Access recipes directly from the recipe store
-    recipeStore() {
-      return useRecipeStore();
+    // Use computed property for reversed recipes
+    reversedRecipes() {
+      const store = useRecipeStore();
+      return store.recipes.slice().reverse();
     },
     formattedIngredients() {
-      if (!this.selectedRecipe.ingredients) return '';
+      if (!this.selectedRecipe.ingredients) return [];
       try {
-        return JSON.parse(this.selectedRecipe.ingredients).join(', ');
+        return JSON.parse(this.selectedRecipe.ingredients);
       } catch (e) {
         console.error('Error parsing ingredients:', e);
+        return [];
       }
     },
     formattedSteps() {
@@ -146,6 +151,23 @@ export default {
       this.selectedRecipe = {};
       this.recipeDialog = false;
     },
+    deleteRecipe() {
+    if (this.selectedRecipe && this.selectedRecipe.id) {
+      const recipeId = this.selectedRecipe.id;
+      apiService.deleteRecipe({ action: 'delete', id: recipeId })
+        .then(() => {
+          // Remove the deleted recipe from the local store
+          const store = useRecipeStore();
+          store.setRecipes(store.recipes.filter(recipe => recipe.id !== recipeId));
+
+          // Close the dialog
+          this.closeRecipeDialog();
+        })
+        .catch(error => {
+          console.error('Error deleting recipe:', error);
+        });
+    }
+  },
   },
 };
 </script>
@@ -156,7 +178,6 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px solid black;
 }
 
 .profile-header {
@@ -164,7 +185,6 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px solid black;
   margin: 50px 0 20px 0;
 }
 
@@ -198,4 +218,24 @@ export default {
   max-width: 1000px;
   height: auto;
 }
+
+.steps-list {
+  margin-left: 20px;
+}
+
+.ingredients-list {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  max-height: 10rem;
+  list-style: none;
+}
+
+.user-recipes {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
 </style>

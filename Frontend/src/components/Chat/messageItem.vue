@@ -5,54 +5,76 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      message: Object,
+import { useThemeStore } from '../../stores/themeStore';
+export default {
+  props: {
+    message: Object
+  },
+  computed: {
+    isDarkTheme() {
+      console.log('[Component] isDarkTheme computed property:', this.$themeState.isDark);
+      return this.$themeState.isDark;
     },
-    computed: {
-      messageClass() {
-        return {
-          'user-message': this.message.role === 'user',
-          'assistant-message': this.message.role === 'assistant',
-          'dark-theme': this.$vuetify.theme.dark,
-        };
-      },
-    },
-  };
+    messageClass() {
+      const classes = {
+        'user-message': this.message.role === 'user',
+        'assistant-message': this.message.role === 'assistant',
+        'dark-theme': this.isDarkTheme,
+      };
+
+      console.log(`Message role: ${this.message.role}, Classes:`, classes);
+      console.log('Current theme in messageItem:', this.isDarkTheme ? 'Dark' : 'Light');
+      return classes;
+    }
+  },
+  mounted() {
+    console.log('CSS variable --v-theme-background:', getComputedStyle(document.documentElement).getPropertyValue('--v-theme-background'));
+    console.log('CSS variable --v-theme-surface:', getComputedStyle(document.documentElement).getPropertyValue('--v-theme-surface'));
+  }
+};
 </script>
 
+
+
 <style>
-  .user-message,
-  .assistant-message {
-    padding: 10px;
-    border-radius: 10px;
-    text-align: left;
-  }
+.user-message, .assistant-message {
+  padding: 10px;
+  border-radius: 10px;
+}
 
-  .user-message {
-    --message-background: var(--v-theme-background); /* Lighter/darker based on theme */
-    --message-color: var(--v-theme-on-background);
-  }
+.user-message {
+  background-color: #363636;
+  text-align: right;
 
-  .assistant-message {
-    --message-background: var(--v-theme-surface); /* Lighter/darker based on theme */
-    --message-color: var(--v-theme-on-surface);
-  }
+}
 
-  .dark-theme .user-message,
-  .dark-theme .assistant-message {
-    --message-background: var(--v-theme-surface); /* Adjust for dark theme */
-    --message-color: var(--v-theme-on-surface);
-  }
+.assistant-message {
+  background-color: #5d5d5d;
+  text-align: left;
 
-  .user-message {
-    background-color: var(--message-background);
-    color: var(--message-color);
-    text-align: right; /* Align user messages to right */
-  }
+}
 
-  .assistant-message {
-    background-color: var(--message-background);
-    color: var(--message-color);
-  }
+
+/* Light Theme */
+.user-message:not(.dark-theme) {
+  background-color: #c5ab85; /* Light grey for user messages */
+  color: #000; /* Dark text for readability */
+}
+
+.assistant-message:not(.dark-theme) {
+  background-color: #e3d0be; /* Slightly lighter grey for assistant messages */
+  color: #000;
+}
+
+/* Dark Theme */
+.dark-theme .user-message {
+  background-color: #333; /* Darker color for user messages */
+  color: #fff; /* Light text for readability */
+}
+
+.dark-theme .assistant-message {
+  background-color: #444; /* Slightly lighter color for assistant messages */
+  color: #fff;
+}
+
 </style>

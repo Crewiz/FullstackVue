@@ -5,7 +5,7 @@
         <v-card class="chat-content" ref="chatContent">
           <message-list :messages="messages" />
         </v-card>
-        <v-card class="loading">
+        <v-card v-if="isLoading" class="loading">
           <div class="typewriter">
             <h3>
               Chatman is typing
@@ -21,8 +21,11 @@
         <ingredients-list :ingredients="ingredients" :recipe-name="recipeName" :prep-time="prepTime" :servings="servings" />
         <v-btn class="review-button" @click.prevent="reviewRecipe">Review recipe</v-btn>
       </v-col>
-      <v-col v-else>
-        <h1>Oh no 😢</h1>
+      <v-col class="instructions" v-else>
+        <h2>To get a recipe, simply type the ingredients you have.</h2>
+        <h4>For example, "I have flour, milk, and eggs. Give me a recipe for pancakes."</h4>
+        <h4>Press Enter, and RecipeBot will provide you with a delicious recipe.</h4>
+
       </v-col>
     </v-row>
   </v-container>
@@ -127,10 +130,7 @@
           this.ingredients = [];
           this.instructions = [];
         } finally {
-          console.log(this.isLoading);
-
           this.setLoading(false);
-          console.log(this.isLoading);
         }
 
         this.$nextTick(() => {
@@ -234,5 +234,13 @@
     align-items: center;
   }
 
+  .instructions {
+    display: flex;
+    flex-direction: column;  
+  }
+
+  .instructions h2 {
+    margin: 250px 0 20px;
+  }
   /* Lägg till andra stilar efter behov */
 </style>

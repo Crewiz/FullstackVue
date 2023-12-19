@@ -1,5 +1,7 @@
 <template>
   <v-container>
+    <navigation-bar />
+
     <h1 class="text-h3">Review Recipe</h1>
     <v-form @submit.prevent="handleSubmit">
       <div class="text-h4">{{ title }}</div>
@@ -30,8 +32,13 @@
   import useRecipeStore from '../../stores/recipeStore';
   import useAuthStore from '../../stores/authStore'
   import apiService from '../../API/apiService';
+  import navigationBar from '../layout/navigationBar.vue';
 
-  export default defineComponent({
+export default defineComponent({
+  name: 'RecipeReview',
+  components: {
+      navigationBar,
+    },
     data() {
       return {
         title: useRecipeStore().getRecipe.title,
@@ -98,16 +105,20 @@
     if (response.status === 200 || response.status === 201) {
       this.submissionMessage = 'Recipe uploaded to DB!';
       console.log('Recipe successfully uploaded to DB');
-      /* this.$router.push('/homePage') */;
+      this.$router.push('/profile');
     } else {
       // Handle other status codes appropriately
+      this.$router.push('/profile');
       throw new Error(`Failed to upload recipe, ${response.status}`);
+
     }
-  } catch (error) {
-    console.error("Error submitting form", error);
-    this.submissionMessage = 'Failed uploading recipe. Please try again.';
-  }
-      },
+    } catch (error) {
+      console.error("Error submitting form", error);
+      this.submissionMessage = 'Failed uploading recipe. Please try again.';
+        } finally {
+      this.$router.push('/profile');
+    } 
+    },
     },
   });
 </script>

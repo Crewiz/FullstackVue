@@ -100,6 +100,8 @@ type TrpcResult<T> = {
 const apiService = {
   // User Actions
   async createUser(userData: UserRegistrationData): Promise<AxiosResponse<UserResponse>> {
+    console.log(`[${new Date().toISOString()}] Making API request to: ${requestUrl}`);
+    console.log(`Request Payload: `, userData);
     try {
       console.log("Making API request with:", userData);
       const response = await axios.post<UserResponse>(`${BASE_URL}/user`, {
@@ -187,9 +189,6 @@ const apiService = {
         data: recipeData,
       });
 
-      console.log("Request successful, statuscode:", response);
-      console.log("Recipe title:", response.data.recipe.title);
-
       return response; // Return the whole response
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
@@ -208,6 +207,7 @@ const apiService = {
     }
   },
 
+  //hämtar alla recept från en avnändare
   async getAllUserRecipes(userId: number): Promise<RecipeResponse[]> {
     console.log(`getAllRecipes called with userId: ${userId}`);
     try {
@@ -221,7 +221,36 @@ const apiService = {
         console.error('Error fetching all recipes for user:', axiosError.message);
         throw new Error(axiosError.response?.data.message || 'An error occurred during API request to fetch all recipes for user');
     }
-}
+},
+
+//hämtar alla recept  -- funkar ej atm
+async getAllRecipes(): Promise<RecipeResponse[]> {
+  try {
+    const response = await axios.post<TrpcResult<RecipeResponse[]>>(`${BASE_URL}/recipe`, {
+      action: 'getAll',
+    });
+
+    console.log('Response from getAllRecipes:', response.data.result.data);
+    return response.data.result.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    console.error('Error fetching all recipes:', axiosError.message);
+    throw new Error(axiosError.response?.data.message || 'An error occurred during API request to fetch all recipes');
+  }
+},
+
+
+  async deleteRecipe(deleteRecipeData: { action: 'delete'; id: number }): Promise<void> {
+    try {
+      await axios.post<void>(`${BASE_URL}/recipe`, deleteRecipeData);
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      console.error("Error deleting recipe:", axiosError.message);
+      throw new Error(axiosError.response?.data.message || 'An error occurred during API request');
+    }
+  }
+
+
 }
 
 export default apiService;

@@ -1,6 +1,6 @@
 <template>
+    <h2 class="saved-recipes">Saved recipes</h2>
     <div class="profile-posts">
-      <h2>Saved recipes</h2>
       <v-list v-if="recipes.length" class="post-container">
         <v-list-item v-for="recipe in recipes" :key="recipe.id" class="recipe-container">
           <v-list-item-content @click="openRecipeDialog(recipe)">
@@ -28,27 +28,30 @@ export default {
   
   <style scoped>
   .recipe-container {
-    width: 350px;
+    max-width: 20rem;
     height: 200px;
     border: 2px solid black;
     margin: 1rem;
     display: flex;
-    justify-content: center;
   }
 
   .profile-posts {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 2px solid black;
+  border-top: 2px solid black;
   margin: 50px 0 20px 0;
-  width: 100%;
-  min-height: auto;
+  text-align: center;
+  background-color: #F0DFC0;
 }
 
 .post-container {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.saved-recipes {
+  display: flex;
+  margin-bottom: -40px;
   justify-content: center;
 }
 

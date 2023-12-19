@@ -112,6 +112,7 @@ export const recipeRouter = t.procedure
                 }
             case 'getAll':
                 try {
+                    console.log("Fetching all recipes");
                     const recipes = await db.recipe.findMany();
                     return recipes;
                 } catch (error) {
