@@ -4,29 +4,28 @@
       <v-col class="chat-container d-flex flex-column">
         <v-card class="chat-content" ref="chatContent">
           <message-list :messages="messages" />
-          <div v-if="isLoading" class="loading"></div>
+        </v-card>
+        <v-card class="loading">
+          <div class="typewriter">
+            <h3>
+              Chatman is typing
+              <span class="typed-text">{{ typeValue }}</span>
+            </h3>
+          </div>
         </v-card>
         <chat-input @sendMessage="handleSendMessage" />
       </v-col>
 
       <v-col v-if="ingredients.length" cols="4">
         <!-- Sidebar for ingredients -->
-        <ingredients-list
-          :ingredients="ingredients"
-          :recipe-name="recipeName"
-          :prep-time="prepTime"
-          :servings="servings"
-        />
+        <ingredients-list :ingredients="ingredients" :recipe-name="recipeName" :prep-time="prepTime" :servings="servings" />
         <v-btn class="review-button" @click.prevent="reviewRecipe">Review recipe</v-btn>
       </v-col>
       <v-col v-else>
         <h1>Oh no 😢</h1>
       </v-col>
-      
-
     </v-row>
   </v-container>
-  <div v-if="isLoading">loadingtest</div>
 </template>
 
 <script lang="ts">
@@ -78,6 +77,14 @@
         prepTime: '',
         servings: '',
         isLoading: false,
+        typeValue: '',
+        typeStatus: false,
+        displayTextArray: ['...'],
+        typingSpeed: 100,
+        erasingSpeed: 100,
+        newTextDelay: 2000,
+        displayTextArrayIndex: 0,
+        charIndex: 0,
       };
     },
     methods: {
@@ -87,12 +94,11 @@
       },
       async handleSendMessage(userMessage: string) {
         this.addMessage({ role: 'user', content: userMessage });
-        this.setLoading(true)
+        this.setLoading(true);
         try {
           const response = await apiService.getAssistantResponse(userMessage);
           console.log(this.isLoading);
-          
-          
+
           if (response && response.result && typeof response.result.data === 'string') {
             const recipeData = JSON.parse(response.result.data);
             const normalizedRecipeData = normalizeRecipeData(recipeData);
@@ -122,8 +128,8 @@
           this.instructions = [];
         } finally {
           console.log(this.isLoading);
-          
-          this.setLoading(false)
+
+          this.setLoading(false);
           console.log(this.isLoading);
         }
 
@@ -131,8 +137,8 @@
           this.scrollToBottom();
         });
       },
-      setLoading(value: boolean){
-        this.isLoading = value
+      setLoading(value: boolean) {
+        this.isLoading = value;
       },
 
       addMessage(message: { role: string; content: string }) {
@@ -158,6 +164,33 @@
           name: 'recipeReview',
         });
       },
+      typeText() {
+        if (this.charIndex < this.displayTextArray[this.displayTextArrayIndex].length) {
+          if (!this.typeStatus) this.typeStatus = true;
+          this.typeValue += this.displayTextArray[this.displayTextArrayIndex].charAt(this.charIndex);
+          this.charIndex += 1;
+          setTimeout(this.typeText, this.typingSpeed);
+        } else {
+          this.typeStatus = false;
+          setTimeout(this.eraseText, this.newTextDelay);
+        }
+      },
+      eraseText() {
+        if (this.charIndex > 0) {
+          if (!this.typeStatus) this.typeStatus = true;
+          this.typeValue = this.displayTextArray[this.displayTextArrayIndex].substring(0, this.charIndex - 1);
+          this.charIndex -= 1;
+          setTimeout(this.eraseText, this.erasingSpeed);
+        } else {
+          this.typeStatus = false;
+          this.displayTextArrayIndex += 1;
+          if (this.displayTextArrayIndex >= this.displayTextArray.length) this.displayTextArrayIndex = 0;
+          setTimeout(this.typeText, this.typingSpeed + 1000);
+        }
+      },
+    },
+    created() {
+      setTimeout(this.typeText, this.newTextDelay + 200);
     },
   };
 </script>
@@ -182,15 +215,24 @@
     flex-direction: column-reverse; /* Ändrad riktning för att chatten ska börja längst ner och röra sig uppåt */
   }
   .loading {
-  background: transparent url('https://miro.medium.com/max/882/1*9EBHIOzhE1XfMYoKz1JcsQ.gif') center no-repeat;
-  height: 400px;
-  width: 400px;
-  margin-left: 380px;
-  text-align: center;
-}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 50px;
+    min-height: 50px;
+    width: inherit;
+  }
 
   .review-button {
     margin-top: 20px;
   }
+  .typewriter {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   /* Lägg till andra stilar efter behov */
 </style>
