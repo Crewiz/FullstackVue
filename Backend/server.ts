@@ -5,11 +5,20 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { createAppRouter } from './trpc/router';
 import { decodeAndVerifyJwtToken } from './utility/jwtUtils';
+import path from 'path'
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
+
+app.use(express.static(path.join(__dirname, '../Frontend/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Frontend/dist', 'index.html'));
+});
+
+
 
 import { userRouter } from './trpc/userRouter';
 import { gptRouter } from './trpc/gptRouter';
