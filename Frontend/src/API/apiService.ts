@@ -54,9 +54,17 @@ interface ErrorResponse {
 type ChatResponse = string;
 
 export interface GptRecipeResponse {
-  ingredients: string[];
-  instructions: string[];
+  result: {
+    data: {
+      recipe: string;
+      prep_time: string;
+      servings: string;
+      ingredients: string[];
+      instructions: string[];
+    };
+  };
 }
+
 
 interface RecipeData {
   title: string;

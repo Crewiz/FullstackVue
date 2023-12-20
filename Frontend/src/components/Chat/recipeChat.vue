@@ -94,46 +94,62 @@ export default {
       const chatContent = this.$refs.chatContent as HTMLElement;
       chatContent.scrollTop = chatContent.scrollHeight;
     },
+    
     async handleSendMessage(userMessage: string): Promise<void> {
-      this.addMessage({ role: 'user', content: userMessage });
-      this.setLoading(true);
+  console.log('User Message:', userMessage); 
+  this.addMessage({ role: 'user', content: userMessage });
+  this.setLoading(true);
 
-      try {
-        const response: string | GptRecipeResponse = await apiService.getAssistantResponse(userMessage);
+  try {
+    const response: string | GptRecipeResponse = await apiService.getAssistantResponse(userMessage);
+    console.log('API Response:', response);
 
-        if (typeof response === 'object' && 'ingredients' in response && 'instructions' in response) {
-          // Handle GptRecipeResponse
-          const normalizedRecipeData: Record<string, any> = normalizeRecipeData(response);
-          console.log('Normalized Data:', normalizedRecipeData);
+    let parsedResponse;
+    if (typeof response === 'string') {
+      this.addMessage({ role: 'assistant', content: response });
+      this.ingredients = [];
+      this.instructions = [];
+    } else {
+      // Check if 'result' property exists in GptRecipeResponse
+      if (response.result && response.result.data) {
+        //@ts-ignore
+        parsedResponse = JSON.parse(response.result.data);
+        console.log('Parsed Response:', parsedResponse);
 
-          this.ingredients = normalizedRecipeData.ingredients as string[];
-          this.instructions = normalizedRecipeData.instructions as string[];
-          this.recipeName = normalizedRecipeData.recipe as string;
-          this.prepTime = normalizedRecipeData.prepTime as string;
-          this.servings = normalizedRecipeData.servings as string;
+        
+        const normalizedRecipeData: Record<string, any> = normalizeRecipeData(parsedResponse);
+        console.log('Normalized Data:', normalizedRecipeData);
 
-          this.instructions.forEach((instruction: string) => {
-            this.addMessage({ role: 'assistant', content: instruction });
-          });
-        } else if (typeof response === 'string') {
-          // Handle string response
-          this.addMessage({ role: 'assistant', content: response });
-          this.ingredients = [];
-          this.instructions = [];
-        }
-      } catch (error: any) {
-        console.error('Error in handleSendMessage:', error);
-        this.addMessage({ role: 'system', content: 'Sorry, there was an error processing your request.' });
-        this.ingredients = [];
-        this.instructions = [];
-      } finally {
-        this.setLoading(false);
+        this.ingredients = normalizedRecipeData.ingredients as string[];
+        this.instructions = normalizedRecipeData.instructions as string[];
+        this.recipeName = normalizedRecipeData.recipe as string;
+        this.prepTime = normalizedRecipeData.prepTime as string;
+        this.servings = normalizedRecipeData.servings as string;
+
+        this.instructions.forEach((instruction: string) => {
+          this.addMessage({ role: 'assistant', content: instruction });
+        });
+      } else {
+               console.error('Error parsing response:', response);
+        // Handle the error appropriately
       }
+    }
+  } catch (error: any) {
+    console.error('Error in handleSendMessage:', error);
+    this.addMessage({ role: 'system', content: 'Sorry, there was an error processing your request.' });
+    this.ingredients = [];
+    this.instructions = [];
+  } finally {
+    this.setLoading(false);
+  }
 
-      this.$nextTick(() => {
-        this.scrollToBottom();
-      });
-    },
+  this.$nextTick(() => {
+    this.scrollToBottom();
+  });
+}
+
+,
+
 
     setLoading(value: boolean) {
       this.isLoading = value;
