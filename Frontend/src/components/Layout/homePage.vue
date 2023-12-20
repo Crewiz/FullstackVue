@@ -25,7 +25,7 @@
 
 <script>
 import useAuthStore from '../../stores/authStore';
-import loginForm from '../Auth/loginform.vue';
+import loginForm from '../Auth/loginForm.vue';
 import recipeChat from '../Chat/recipeChat.vue';
 import navigationBar from './navigationBar.vue';
 import typewriter from './typewriter.vue';

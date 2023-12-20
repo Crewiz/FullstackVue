@@ -32,7 +32,7 @@
   import useRecipeStore from '../../stores/recipeStore';
   import useAuthStore from '../../stores/authStore'
   import apiService from '../../API/apiService';
-  import navigationBar from '../layout/navigationBar.vue';
+  import navigationBar from '../Layout/navigationBar.vue';
 
 export default defineComponent({
   name: 'RecipeReview',

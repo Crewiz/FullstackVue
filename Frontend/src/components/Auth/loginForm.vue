@@ -45,6 +45,10 @@ export default {
         console.log('Updating authStore with token:', token);
 
         const authStore = useAuthStore();
+
+        if (user.id === undefined) {
+          user.id = 0;
+        }
         authStore.loginUser(user, token);
 
         // Optional: Emit an event for successful login

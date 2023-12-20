@@ -2,12 +2,12 @@ import { createApp, watch, reactive } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { createPinia } from 'pinia';
-import { useThemeStore } from './stores/themestore.ts';
+import { useThemeStore } from './stores/themeStore.ts';
 
 //component imports
 import homePage from './components/Layout/homePage.vue';
 import registrationForm from './components/Auth/registrationForm.vue';
-import userProfile from './components/user/userProfile.vue';
+import userProfile from './components/User/userProfile.vue';
 import recipeReview from './components/Recipe/recipeReview.vue';
 
 // Vuetify

@@ -12,18 +12,18 @@ interface UserRegistrationData {
   password: string;
 }
 
-interface UserUpdateData {
+/* interface UserUpdateData {
   firstName?: string;
   lastName?: string;
   email?: string;
   // Include other fields that can be updated
-}
+} */
 
-interface UserActionRequest {
+/* interface UserActionRequest {
   action: 'create' | 'get' | 'update' | 'delete';
   data?: UserRegistrationData | UserUpdateData;
   id?: number;
-}
+} */
 
 interface UserResponse {
   result: {
@@ -31,6 +31,9 @@ interface UserResponse {
       user: {
         firstName: string;
         lastName: string;
+        id?: number;
+        email?: string;
+        name?: string;
         // other user properties
       },
       token: string;
@@ -50,7 +53,7 @@ interface ErrorResponse {
 }
 type ChatResponse = string;
 
-interface GptRecipeResponse {
+export interface GptRecipeResponse {
   ingredients: string[];
   instructions: string[];
 }
@@ -58,24 +61,24 @@ interface GptRecipeResponse {
 interface RecipeData {
   title: string;
   description: string;
-  ingredients: string; // ska det va array här?
+  ingredients: string; 
   steps: string;
   authorId: number | undefined
 }
 
-interface RecipeUpdateData {
+/* interface RecipeUpdateData {
   title?: string;
   description?: string;
   ingredients?: string;
   steps?: string;
   // Include other fields that can be updated
-}
+} */
 
-interface RecipeActionRequest {
+/* interface RecipeActionRequest {
   action: 'create' | 'update' | 'delete' | 'get' | 'getAll';
   data?: RecipeData | RecipeUpdateData;
   id?: number;
-}
+} */
 
 interface RecipeResponse {
   recipe: {
@@ -100,7 +103,7 @@ type TrpcResult<T> = {
 const apiService = {
   // User Actions
   async createUser(userData: UserRegistrationData): Promise<AxiosResponse<UserResponse>> {
-    console.log(`[${new Date().toISOString()}] Making API request to: ${requestUrl}`);
+    // console.log(`[${new Date().toISOString()}] Making API request to: ${requestUrl}`);
     console.log(`Request Payload: `, userData);
     try {
       console.log("Making API request with:", userData);
@@ -109,7 +112,7 @@ const apiService = {
         data: userData,
       });
       console.log("Login successful", response);
-      console.log("User's first name:", response.data.user.firstName);
+      // console.log("User's first name:", response.data.user.firstName);
       return response; // Return the whole response
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
@@ -177,7 +180,7 @@ const apiService = {
       }
       throw new Error(axiosError.response?.data.message || 'An error occurred during API request to get assistant response');
     }
-    
+    throw new Error;
   },
   // Recipe Actions
   async createRecipe(recipeData: RecipeData): Promise<AxiosResponse<RecipeResponse>> {

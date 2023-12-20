@@ -66,7 +66,7 @@
             hide-details
             @input="clearValidationError('confirmPassword')"
           ></v-text-field>
-          <span v-if="validationErrors.confirmPassword" class="error-message">{{ validationErrors.confirmPassword }}</span>
+          <span v-if="!isPasswordMatch" class="error-message">Passwords must match</span>
         </v-col>
         <v-btn type="submit" :disabled="!valid" block class="mt-2">Register</v-btn>
       </v-row>
@@ -77,10 +77,50 @@
 
 <script lang="ts">
 import { z } from 'zod';
-import apiService from '../../API/apiService'
+import apiService from '../../API/apiService';
+
+function createFormSchema() {
+  return z.object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
+    email: z.string().email('Invalid email format'),
+    password: z.string().min(6, 'Password must be at least 6 characters long'),
+    confirmPassword: z.string(),
+  }).refine(data => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+}
+
+interface RegistrationFormData {
+  valid: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  formSchema: ReturnType<typeof createFormSchema> | null;
+  firstNameRules: ((v: string) => boolean | string)[];
+  lastNameRules: ((v: string) => boolean | string)[];
+  emailRules: ((v: string) => boolean | string)[];
+  passwordRules: ((v: string) => boolean | string)[];
+  confirmPasswordRules: ((v: string) => boolean | string)[];
+  validationErrors: Record<string, string>;
+  submissionMessage: string;
+}
+
+interface ZodError {
+  formErrors: {
+    fieldErrors: Record<string, string[]>;
+  };
+}
+
+interface ValidationErrors {
+  [key: string]: string;
+}
 
 export default {
-  data() {
+  data(): RegistrationFormData {
     return {
       valid: false,
       firstName: '',
@@ -88,45 +128,41 @@ export default {
       email: '',
       password: '',
       confirmPassword: '',
+      formSchema: null,
       firstNameRules: [
-        v => !!v || 'First name is required',
-        v => v.length <= 10 || 'First name must be less than 10 characters'
+        (v: string) => !!v || 'First name is required',
+        (v: string) => v.length <= 10 || 'First name must be less than 10 characters'
       ],
       lastNameRules: [
-        v => !!v || 'Last name is required',
-        v => v.length <= 10 || 'Last name must be less than 10 characters'
+        (v: string) => !!v || 'Last name is required',
+        (v: string) => v.length <= 10 || 'Last name must be less than 10 characters'
       ],
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+        (v: string) => !!v || 'E-mail is required',
+        (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
       ],
       passwordRules: [
-        v => !!v || 'Password is required',
-        v => v.length >= 6 || 'Password must be at least 6 characters',
-        v => /[A-Z]/.test(v) || 'Password must contain at least one uppercase letter',
-        v => /[a-z]/.test(v) || 'Password must contain at least one lowercase letter',
-        v => /[0-9]/.test(v) || 'Password must contain at least one number',
-        v => /[\!\@\#\$\%\^\&\*]/.test(v) || 'Password must contain at least one special character (!@#$%^&*)'
+        (v: string) => !!v || 'Password is required',
+        (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+        (v: string) => /[A-Z]/.test(v) || 'Password must contain at least one uppercase letter',
+        (v: string) => /[a-z]/.test(v) || 'Password must contain at least one lowercase letter',
+        (v: string) => /[0-9]/.test(v) || 'Password must contain at least one number',
+        (v: string) => /[\!\@\#\$\%\^\&\*]/.test(v) || 'Password must contain at least one special character (!@#$%^&*)'
       ],
       confirmPasswordRules: [
-        v => !!v || 'Confirm password is required',
-        v => v === this.password || 'Passwords must match'
+        (v: string) => !!v || 'Confirm password is required',
       ],
       validationErrors: {},
-      submissionMessage: '', 
+      submissionMessage: '',
     };
   },
   created() {
-    this.formSchema = z.object({
-      firstName: z.string().min(1, 'First name is required'),
-      lastName: z.string().min(1, 'Last name is required'),
-      email: z.string().email('Invalid email format'),
-      password: z.string().min(6, 'Password must be at least 6 characters long'),
-      confirmPassword: z.string(),
-    }).refine(data => data.password === data.confirmPassword, {
-      message: "Passwords don't match",
-      path: ['confirmPassword'],
-    });
+    this.formSchema = createFormSchema();
+  },
+  computed: {
+    isPasswordMatch() {
+      return this.password === this.confirmPassword;
+    }
   },
   methods: {
     async handleSubmit() {
@@ -139,40 +175,45 @@ export default {
         confirmPassword: this.confirmPassword
       };
 
-      // Validate formData against the Zod schema
-      const validationResult = this.formSchema.safeParse(formData);
+      if (this.formSchema) {
+    const validationResult = this.formSchema.safeParse(formData);
+    if (!validationResult.success) {
+      console.log("Validation failed with errors:", validationResult.error);
+      this.validationErrors = this.formatZodErrors(validationResult.error);
+      this.submissionMessage = '';
+      return;
+    }
+  } else {
+    console.error("Form schema is not initialized");
+    // Handle the case where formSchema is null, e.g., set an error message
+    this.submissionMessage = 'Form schema is not initialized. Cannot validate form.';
+    return;
+  }
 
-      // Check if validation was successful
+
+      const validationResult = this.formSchema.safeParse(formData);
       if (!validationResult.success) {
-        console.log("Validation failed with errors:", this.validationErrors);
-        // Format and store validation errors for displaying to the user
+        console.log("Validation failed with errors:", validationResult.error);
         this.validationErrors = this.formatZodErrors(validationResult.error);
-        this.submissionMessage = ''; // Clear success message
-        return; // Stop the submission process if validation fails
+        this.submissionMessage = '';
+        return;
       }
 
-      // If validation passes, proceed with submitting the form data
       try {
-    const response = await apiService.createUser(formData);
-
-    // If the request was processed successfully
-    if (response.status === 200 || response.status === 201) {
-      this.submissionMessage = 'Registration successful!';
-      this.$router.push('/homePage');
-    } else {
-      // Handle other status codes appropriately
-      throw new Error(`Failed to register user: Status code ${response.status}`);
-    }
-  } catch (error) {
-    console.error("Error submitting form", error);
-    this.submissionMessage = 'Registration failed. Please try again.';
-  }
-},
-
-
-    // Utility method to format Zod errors
-    formatZodErrors(zodError) {
-      const formattedErrors = {};
+        const response = await apiService.createUser(formData);
+        if (response.status === 200 || response.status === 201) {
+          this.submissionMessage = 'Registration successful!';
+          this.$router.push('/homePage');
+        } else {
+          throw new Error(`Failed to register user: Status code ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error submitting form", error);
+        this.submissionMessage = 'Registration failed. Please try again.';
+      }
+    },
+    formatZodErrors(zodError: ZodError) {
+      const formattedErrors: ValidationErrors = {};
       if (zodError.formErrors && zodError.formErrors.fieldErrors) {
         for (const [key, value] of Object.entries(zodError.formErrors.fieldErrors)) {
           formattedErrors[key] = value.join(', ');
@@ -180,9 +221,8 @@ export default {
       }
       return formattedErrors;
     },
-
-    clearValidationError(field) {
-      this.validationErrors[field] = ''; // Clear the error message
+    clearValidationError(field: string): void {
+      this.validationErrors[field] = '';
     },
   },
 };
@@ -194,7 +234,6 @@ export default {
   font-size: 0.8rem;
   margin-top: 5px;
 }
-
 .success-message {
   color: green;
   font-size: 0.8rem;
