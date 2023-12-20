@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "cd backend && prisma generate",
+    "postinstall": "cd Backend && prisma generate",
     "start": "nodemon --exec ts-node Backend/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
